@@ -1,5 +1,5 @@
 var app = angular.module('update.service', ['db.service']);
-app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFileTransfer, $cordovaZip, $cordovaFile){
+app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFileTransfer, $cordovaFile, DbItemAdd){
   var self = {};
   var random = function(){
     var text = "";
@@ -16,6 +16,7 @@ app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFile
         lastname: userInfo[1],
         admnNo: userInfo[2]
       };
+      console.log(user);
       var url = "";
       if(userInfo[3] == "intranet"){
         url = "someIp";
@@ -23,9 +24,25 @@ app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFile
       else{
         url = "someURL";
       }
-      $http.post(url, user).then(function(data){
-        // TODO:
-        d.resolve();
+      $http.get('./js/updateReply.json').then(function(reply){
+        angular.forEach(reply, function(item, index){
+          if(item.type == "question"){
+            DbItemAdd.addQuestion(item).then(function(success){
+              console.log("question Added");
+            });
+          }
+          else if(item.type == "video"){
+            DbItemAdd.addVideo(item).then(function(success){
+              console.log("video Added");
+            });
+          }
+          else if(item.type == "studyMaterial"){
+            DbItemAdd.addStudyMaterial(item).then(function(success){
+              console.log("question Added");
+            });
+          }
+        });
+        d.resolve(reply);
       }, function(err){
         console.log(err);
         d.reject();

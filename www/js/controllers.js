@@ -61,6 +61,8 @@ angular.module('starter.controllers', ['db.service'])
   $scope.reset = function(){
     console.log("reset");
   };
+
+  //this is for dev only
   $scope.delDB = function(){
     $cordovaSQLite.deleteDB({name: 'my.db', location: 'default'});
   };

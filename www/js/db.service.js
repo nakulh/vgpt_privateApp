@@ -2,8 +2,10 @@ var db = null;
 var app = angular.module('db.service', []);
 
 app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
-  var uuid = $cordovaDevice.getUUID();
+  //var uuid = $cordovaDevice.getUUID();
   var self = {};
+
+  //change access type: intranet or internet
   self.changeAccess = function(accessMethod){
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var d = $q.defer();
@@ -17,6 +19,8 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
     });
     return d.promise;
   };
+
+  //Get basic user info
   self.getUserInfo = function(){
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var d  = $q.defer();
@@ -32,6 +36,99 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
       }
       return d.promise;
     });
+  };
+
+  return self;
+});
+app.factory('DbItemAdd', function($q, $cordovaSQLite){
+  var self = {};
+  self.addQuestion = function(question){
+    var dbObj = {
+      physics: 'physicsQuestions',
+      chemistry: 'chemistryQuestions',
+      maths: 'mathsQuestions'
+    };
+    var d = $q.defer();
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var query = "INSERT INTO " + dbObj[question.subject] + " (chapter, topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $cordovaSQLite.execute(db, query, [question.chapter, question.topic, question.question, question.questionImage,
+                                       question.a, question.aImg, question.b, question.bImg, question.c, question.cImg,
+                                       question.d, question.dImg, question.answer, question.level, 0, question.id])
+                                       .then(function(result){
+                                          d.resolve();
+                                          console.log("insert id = " + result.insertId);
+                                        });
+    return d.promise;
+  };
+  self.addVideo = function(video){
+    var dbObj = {
+      physics: "physicsVideos",
+      chemistry: "chemistryVideos",
+      maths: "mathsVideos"
+    };
+    var d = $q.defer();
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var query = "INSERT INTO " + dbObj[video.subject] + " (chapter, topic, source, intranetLink, internetLink, title, description, onDevice, supportMaterial, id, deviceLink) VALUES (?, ?, ?, ?, ?, ?, ?,? ,? ,? ,?)";
+    $cordovaSQLite.execute(db, query, [video.chapter, video.topic, video.source, video.intranetLink, video.internetLink, video.title, video.description, 0, null, video.id, null])
+                            .then(function(result){
+                              d.resolve();
+                              console.log("insert id = " + result.insertId);
+                            });
+    return d.promise;
+  };
+  self.addStudyMaterial = function(file){
+    var dbObj = {
+      physics: "physicsMaterial",
+      chemistry: "chemistryMaterial",
+      maths: "mathsMaterial"
+    };
+    var d = $q.defer();
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var query = "INSERT INTO " + dbObj[file.subject] + " (chapter, topic, intranetLink, internetLink, title, description, onDevice, id, deviceLink, fileType) VALUES (?, ?, ?, ?, ?, ?, ?, ?,? ,? ,? ,?)";
+    $cordovaSQLite.execute(db, query, [file.chapter, file.topic, file.intranetLink, file.internetLink, file.title, file.description, 0, file.id, null, file.fileType])
+                            .then(function(result){
+                              d.resolve();
+                              console.log("insert id = " + result.insertId);
+                            });
+    return d.promise;
+  };
+  return self;
+});
+
+app.factory('DbQuestions', function($q, $cordovaSQLite){
+  var self = {};
+  self.getQuestions = function(subject, topic){
+    var d = $q.defer();
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var query = "SELECT question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, wrong, id FROM '" + subject + "' WHERE topic = ?";
+    $cordovaSQLite.execute(db, query, [topic]).then(function(result){
+      d.resolve();
+      if(result.rows.length > 0){
+        console.log(result.rows);  //result.rows.item[0].question
+        self.questions = result.rows;
+      }
+      else{
+        self.questions = false;
+        console.log("no questions");
+      }
+    });
+    return d.promise;
+  };
+  self.addWrong = function(idArr, wrongNumber, subject){
+    var d = $q.defer();
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    for(x = 0; x < idArr.length; x++){
+      var query = "UPDATE " + subject + " SET wrong = " + wrongNumber[x] + " WHERE id = ?";
+      $cordovaSQLite.execute(db, query, [idArr[x]]);
+    }
+    d.resolve();
+    console.log("wronged all");
+    return d.promise;
+  };
+  self.editStats = function(){
+    var d = $q.defer();
+    
+    return d.promise;
   };
   return self;
 });
