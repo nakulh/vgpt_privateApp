@@ -1,0 +1,9 @@
+<ion-view view-title="Select Your Topic">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-href="#/app/qa/game/{{subject}}/{{topic}}" ng-repeat="topic in topics"> <!-- link to game -->
+        {{topic}}
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

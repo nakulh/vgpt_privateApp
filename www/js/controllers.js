@@ -1,6 +1,6 @@
 angular.module('starter.controllers', ['db.service'])
 
-.controller('AppCtrl', function($scope, $ionicModal, DbServiceSettings, $cordovaDevice) {
+.controller('AppCtrl', function($scope, $ionicModal, DbServiceSettings, $cordovaDevice, $cordovaSQLite) {
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
   // To listen for when this page is active (for example, to refresh data),
@@ -13,15 +13,19 @@ angular.module('starter.controllers', ['db.service'])
     if(intranet){
       DbServiceSettings.changeAccess("intranet").then(function(data){
         console.log("intranet");
-      }, function(err){
-        console.log(err);
+      }, function(error){
+        for(var e in error)
+          console.log(error[e]);
+        console.log("error");
       });
     }
     else{
       DbServiceSettings.changeAccess("internet").then(function(data){
         console.log("internet");
-      }, function(err){
-        console.log(err);
+      }, function(error){
+        for(var e in error)
+          console.log(error[e]);
+        console.log("error");
       });
     }
   };

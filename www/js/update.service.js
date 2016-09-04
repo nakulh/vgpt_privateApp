@@ -24,7 +24,7 @@ app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFile
       else{
         url = "someURL";
       }
-      $http.get('./js/updateReply.json').then(function(reply){
+      $http.get('./js/updateReply.json').success(function(reply){
         angular.forEach(reply, function(item, index){
           if(item.type == "question"){
             DbItemAdd.addQuestion(item).then(function(success){

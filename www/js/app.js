@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 var db = null;
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller'])
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
@@ -38,7 +38,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
 
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
-
     .state('app', {
     url: '/app',
     abstract: true,
@@ -76,27 +75,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     }
   })
 
-  .state('app.qa.directory', {
-    url: '/qa/directory',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/qaDirectory.html',
-        controller: 'QaDirectoryCtrl'
-      }
-    }
-  })
-
-  .state('app.qa.directory.subject', {
-    url: '/qa/directory/:subject',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/qaDirectoryTopic.html',
-        controller: 'QaDirectoryCtrl'
-      }
-    }
-  })
-
-  .state('app.qa.stats', {
+  .state('app.qaStats', {
     url: '/qa/stats',
     views: {
       'menuContent': {
@@ -106,7 +85,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     }
   })
 
-  .state('app.qa.game', {
+  .state('app.qaDir', {
+    url: '/qa/:subject',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/qaDirectorySubject.html',
+        controller: 'QaDirectoryCtrl'
+      }
+    }
+  })
+
+  .state('app.qaGame', {
     url: '/qa/game/:subject/:topic',
     views: {
       'menuContent': {
@@ -116,12 +105,52 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     }
   })
 
-  .state('app.qa.game.end', {
+  .state('app.qaGameEnd', {
     url: '/qa/game/end',
     views: {
       'menuContent': {
         templateUrl: 'templates/qaEnd.html',
         controller: 'QaEndCtrl'
+      }
+    }
+  })
+
+  .state('app.videos', {
+    url: '/videosDir',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/videos.html',
+        controller: 'VideosCtrl'
+      }
+    }
+  })
+
+  .state('app.videosDir', {
+    url: '/videosDir/:subject',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/videosDir.html',
+        controller: 'VideosDirCtrl'
+      }
+    }
+  })
+
+  .state('app.videosSubDir', {
+    url: '/videosDir/:subject/:topic/',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/videodSubDir.html',
+        controller: 'VideoSubDirCtrl'
+      }
+    }
+  })
+
+  .state('app.videosSubDirVideo', {
+    url: '/videosDir/:subject/:topic/:video',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/video.html',
+        controller: 'VideoCtrl'
       }
     }
   });
