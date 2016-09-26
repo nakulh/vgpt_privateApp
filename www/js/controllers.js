@@ -60,6 +60,33 @@ angular.module('starter.controllers', ['db.service'])
       console.log("insert id = " + result.insertId);
     });
     console.log("uuid = " + uuid);
+
+    //Code for sample data
+    query = "INSERT INTO qaLevels (subject, chapter, topic, level) VALUES (?, ?, ?, ?)";
+    $cordovaSQLite.execute(db, query, ["physics", "modern_physics", "modern_physics", 0]).then(function(result){
+      console.log("inserted modern_physics lvl 0");
+    }, function(err){
+      var strBuilder = [];
+      for(var key in err){
+            if (err.hasOwnProperty(key)) {
+               strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+          }
+      }
+      console.log(strBuilder.join(""));
+    });
+    $cordovaSQLite.execute(db, query, ["physics", "mechanics", "mechanics", 0]).then(function(result){
+      console.log("inserted mechanics lvl 0");
+      console.log("insert id = " + result.insertId);
+    }, function(err){
+      var strBuilder = [];
+      for(var key in err){
+            if (err.hasOwnProperty(key)) {
+               strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+          }
+      }
+      console.log(strBuilder.join(""));
+    });
+    //end code for sdample data
     $scope.closeModal();
   };
   $scope.reset = function(){

@@ -23,16 +23,16 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     }
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, accessMethod text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaStats (chapter text, topic text, stat text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaLevels (subject text, chapter text, topic text, level Tinyint)");
   });
 })
 
@@ -96,7 +96,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.qaGame', {
-    url: '/qa/game/:subject/:topic',
+    url: '/qa/game/:subject/:chapter',
     views: {
       'menuContent': {
         templateUrl: 'templates/qaGame.html',
@@ -116,7 +116,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.videos', {
-    url: '/videosDir',
+    url: '/videos',
     views: {
       'menuContent': {
         templateUrl: 'templates/videos.html',
@@ -126,7 +126,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.videosDir', {
-    url: '/videosDir/:subject',
+    url: '/videos/:subject',
     views: {
       'menuContent': {
         templateUrl: 'templates/videosDir.html',
@@ -136,17 +136,17 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.videosSubDir', {
-    url: '/videosDir/:subject/:topic/',
+    url: '/videos/:subject/:chapter/',
     views: {
       'menuContent': {
-        templateUrl: 'templates/videodSubDir.html',
-        controller: 'VideoSubDirCtrl'
+        templateUrl: 'templates/videosSubDir.html',
+        controller: 'VideosSubDirCtrl'
       }
     }
   })
 
   .state('app.videosSubDirVideo', {
-    url: '/videosDir/:subject/:topic/:video',
+    url: '/videos/:subject/:video',
     views: {
       'menuContent': {
         templateUrl: 'templates/video.html',

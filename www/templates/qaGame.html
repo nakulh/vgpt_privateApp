@@ -1,4 +1,17 @@
 <ion-view view-title="game">
   <ion-content>
+    <td-cards>
+      <td-card ng-repeat="card in cards track by $index" on-destroy="cardDestroyed($index)" on-swipe="cardSwiped($index)">
+        <ion-list>
+          <ion-item>{{card.question}}</ion-item>
+          <ion-item>{{card.questionImage}}</ion-item>
+          <ion-radio ng-model="card.userAns" ng-value="'a'">{{card.a}}</ion-radio>
+          <ion-radio ng-model="card.userAns" ng-value="'b'">{{card.b}}</ion-radio>
+          <ion-radio ng-model="card.userAns" ng-value="'c'">{{card.c}}</ion-radio>
+          <ion-radio ng-model="card.userAns" ng-value="'d'">{{card.d}}</ion-radio>
+          {{card.userAns}}
+        </ion-list>
+      </td-card>
+    </td-cards>
   </ion-content>
 </ion-view>
