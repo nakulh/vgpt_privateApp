@@ -20,58 +20,58 @@ app.controller('QaStatsCtrl', function($scope){
 
 });
 
-app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStorage, $location){
+app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStorage, $state){
   var Question = function(q){
-    this.quesiton = q.question;
+    this.question = q.question;
     this.questionImage = q.questionImage;
     this.a = q.A;
     this.b = q.B;
     this.c = q.C;
     this.d = q.D;
-    this.aimg = q.AImg;
-    this.bimg = q.BImg;
-    this.cimg = q.CImg;
-    this.dimg = q.DImg;
+    this.AImg = q.AImg;
+    this.BImg = q.BImg;
+    this.CImg = q.CImg;
+    this.DImg = q.DImg;
     this.answer = q.answer;
     this.wrong = q.wrong;
+    this.level = DbQuestions.level;
   };
-  DbQuestions.getQuestions($stateParams.subject, $stateParams.chapter).then(function(){
+  DbQuestions.getQuestions($stateParams.subject, $stateParams.chapter).then(function(){ //Get questions from db
     console.log("got back");
-    console.log(DbQuestions.questions);
-    $scope.cards = [];
+    var cards = [];
     for(var x = 0; x < DbQuestions.questions.length; x++){
-      $scope.cards.push(new Question(DbQuestions.questions.item(x)));
+      cards.push(new Question(DbQuestions.questions.item(x)));
     }
     switch(DbQuestions.level){
       case 0:
         for(x = 0; x < DbQuestions.questions.length; x++){
-          $scope.cards[x].timing = 3*60*1000;
-          $scope.cards[x].ppoints = $scope.cards[x].wrong > 0 ? 5 : 10;
-          $scope.cards[x].npoints = -2;
+          cards[x].timing = 3*60*1000;
+          cards[x].ppoints = cards[x].wrong > 0 ? 5 : 10;
+          cards[x].npoints = -2;
         }
         console.log("set lvl 0");
         break;
       case 1:
         for(x = 0; x < DbQuestions.questions.length; x++){
-          $scope.cards[x].timing = 5*60*1000;
-          $scope.cards[x].ppoints = $scope.cards[x].wrong > 0 ? 10 : 25;
-          $scope.cards[x].npoints = -5;
+          cards[x].timing = 5*60*1000;
+          cards[x].ppoints = cards[x].wrong > 0 ? 10 : 25;
+          cards[x].npoints = -5;
         }
         console.log("set lvl 1");
         break;
       case 2:
         for(x = 0; x < DbQuestions.questions.length; x++){
-          $scope.cards[x].timing = 10*60*1000;
-          $scope.cards[x].ppoints = $scope.cards[x].wrong > 0 ? 50 : 100;
-          $scope.cards[x].npoints = -25;
+          cards[x].timing = 10*60*1000;
+          cards[x].ppoints = cards[x].wrong > 0 ? 50 : 100;
+          cards[x].npoints = -25;
         }
         console.log("set lvl 2");
         break;
       case 3:
         for(x = 0; x < DbQuestions.questions.length; x++){
-          $scope.cards[x].timing = 15*60*1000;
-          $scope.cards[x].ppoints = $scope.cards[x].wrong > 0 ? 300 : 500;
-          $scope.cards[x].npoints = -200;
+          cards[x].timing = 15*60*1000;
+          cards[x].ppoints = cards[x].wrong > 0 ? 300 : 500;
+          cards[x].npoints = -200;
         }
         console.log("set lvl 3");
         break;
@@ -79,28 +79,28 @@ app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStora
         console.log("error in points config");
         break;
     }
-    $scope.cards.push({
-      question: "end"
-    });
-    var userAns = [];
-    $scope.userAns = function(ans){
-      userAns.push(ans);
+    $scope.totalCards = cards.length;
+    $scope.counter = 0;
+    $scope.card = cards[$scope.counter];
+    $scope.next = function(userAns){
+      $scope.card = cards[++$scope.counter];
+      cards[$scope.counter-1].userAns = userAns;
+      $scope.userAns = false;
     };
-    $scope.cardDestroyed = function(index) {
-      $scope.cards.splice(index, 1);
-    };
-    $scope.cardSwiped = function(index) {
-      var newCard = // new card data
-      $scope.cards.push(newCard);
-    };
-    $scope.end = function(){
+    $scope.end = function(userAns){
       console.log("ending game");
-      QaStorage.storeQuestions($scope.cards, DbQuestions.level);
-      $location.path("#/app/qa/game/end");
+      cards[$scope.counter].userAns = userAns;
+      QaStorage.storeQuestions(cards, DbQuestions.level);
+      $state.go('app.qaGameEnd');
+    };
+    $scope.bookmark = function(){
+      DbQuestions.bookmark(cards[$scope.counter]).then(function(bookmarked){
+        console.log(bookmarked);
+      });
     };
   });
 });
 
 app.controller('QaEndCtrl', function($scope, QaStorage){
-  $scope.questions = QaStorage.getQuestions;
+  $scope.questions = QaStorage.q;
 });
