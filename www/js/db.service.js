@@ -1,3 +1,5 @@
+// This contains (almmost) all the SQLite related functions used in the app
+
 var db = null;
 var app = angular.module('db.service', []);
 app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
@@ -183,12 +185,28 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
     });
     return d.promise;
   };
-  self.addWrong = function(idArr, wrongNumber, subject){
+  self.addWrong = function(questionsArr, wrongArr, subject){
+    var dbObj = {
+      physics: "physicsQuestions",
+      chemistry: "chemistryQuestions",
+      maths: "mathsQuestions"
+    };
     var d = $q.defer();
+    console.log("wronging " + wrongArr.length);
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
-    for(x = 0; x < idArr.length; x++){
-      var query = "UPDATE " + subject + " SET wrong = " + wrongNumber[x] + " WHERE id = ?";
-      $cordovaSQLite.execute(db, query, [idArr[x]]);
+    for(x = 0; x < wrongArr.length; x++){
+      var query = "UPDATE " + dbObj[subject] + " SET wrong = " + wrongArr[x] + " WHERE question = ?";
+      $cordovaSQLite.execute(db, query, [questionsArr[x]]).then(function(result){
+        console.log(result.insertId);
+      }, function(err){
+        var strBuilder = [];
+        for(var key in err){
+              if (err.hasOwnProperty(key)) {
+                 strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+            }
+        }
+        console.log(strBuilder.join(""));
+      });
     }
     d.resolve();
     console.log("wronged all");
@@ -201,13 +219,13 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
   };
   self.bookmark = function(q){
     var d = $q.defer();
-    var insertArr = [q.chapter, q.question, q.questionImage, q.A, q.AImg, q.B, q.BImg, q.C, q.CImg, q.D, q.DImg, q.answer, q.level, q.wrong];
+    var insertArr = [q.subject, q.chapter, q.question, q.questionImage, q.A, q.AImg, q.B, q.BImg, q.C, q.CImg, q.D, q.DImg, q.answer, q.level, q.wrong];
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var query = "SELECT question FROM questionBookmarks WHERE question = ?";
     $cordovaSQLite.execute(db, query, [q.question]).then(function(result){
-      if(result.rows.length == 0){
+      if(result.rows.length === 0){
         console.log("no similarities");
-        query = "INSERT INTO questionBookmarks (chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        query = "INSERT INTO questionBookmarks (subject, chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $cordovaSQLite.execute(db, query, insertArr).then(function(res){
           console.log(res.insertId);
           d.resolve(true);
@@ -233,6 +251,42 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
           }
       }
       console.log(strBuilder.join(""));
+    });
+    return d.promise;
+  };
+  self.changeLevel = function(level, topic){
+    var d = $q.defer();
+    var query = "UPDATE qaLevels SET level = ? WHERE topic = ?";
+    $cordovaSQLite.execute(db, query, [level, topic]).then(function(result){
+      console.log("changed level to " + level);
+    }, function(err){
+      console.log(err.message);
+    });
+  };
+  return self;
+});
+
+app.factory('DbBookmarks', function($q, $cordovaSQLite){
+  var self = {};
+  self.getBookmarks = function(subject){
+    var d = $q.defer();
+    var query = "SELECT * from questionBookmarks WHERE subject = ?";
+    $cordovaSQLite.execute(db, query, [subject]).then(function(result){
+        self.bookmarks = result.rows;
+        d.resolve();
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  self.deleteBookmark = function(question){
+    var d = $q.defer();
+    var quesry = "DELETE FROM questionBookmarks WHERE question = ?";
+    $cordovaSQLite.execute(db, query, [question]).then(function(result){
+      console.log("deleted");
+      d.resolve();
+    }, function(err){
+      console.log(err.message);
     });
     return d.promise;
   };
