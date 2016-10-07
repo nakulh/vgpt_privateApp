@@ -1,0 +1,88 @@
+{
+  "password": "76765i675fyj",
+  "subjects": ["maths", "physics", "chemistry"],
+  "maths": [
+    {
+      "question": "eryhgy5",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    },
+    {
+      "question": "efsfsf",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    }
+  ],
+  "physics": [
+    {
+      "question": "eryhgy5",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    },
+    {
+      "question": "efsfsf",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    }
+  ],
+  "chemistry": [
+    {
+      "question": "eryhgy5",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    },
+    {
+      "question": "efsfsf",
+      "a": "a",
+      "b": "b",
+      "c": "c",
+      "d": "d",
+      "answer": "a",
+      "questionImage": null,
+      "aImg": null,
+      "bimg": null,
+      "cImg": null,
+      "dImg": null
+    }
+  ]
+}

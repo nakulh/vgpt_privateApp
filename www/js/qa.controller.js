@@ -130,7 +130,7 @@ app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStora
   });
 });
 
-app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions){
+app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEditor){
   $scope.questions = QaStorage.q;
   $scope.correct = 0;
   $scope.wrong = 0;
@@ -247,6 +247,9 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions){
     default:
       console.log("level detection error");
   }
+  PointsEditor.appendPointsForGame($scope.points, QaStorage.q[0].subject, QaStorage.q[0].topic, $scope.correct, $scope.wrong).then(function(result){
+    console.log("appended all points");
+  });
   $scope.levelUp = ($scope.levelDown && $scope.levelUp) ? false : true;
   /*if($scope.levelUp){
     DbQuestions.changeLevel(++QaStorage.level).then(function(result){

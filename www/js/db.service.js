@@ -28,19 +28,22 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
     var uuid = $cordovaDevice.getUUID();
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var d  = $q.defer();
-    var query = "SELECT firstname, lastname, admnNo, accessMethod FROM user WHERE deviceId = (?)";
+    var query = "SELECT firstname, lastname, admnNo, accessMethod FROM user WHERE deviceId = ?";
     $cordovaSQLite.execute(db, query, [uuid]).then(function(result){
-      console.log(result);
+      console.log("got user info");
+      console.log(result.rows.item(0).firstname);
       if(result.rows.length > 0){
-          var res =  [result.rows.item[0].firstname, result.rows.item[0].lastname, result.rows.item[0].admnNo, result.rows.item[0].accessMethod];
-          console.log(result.rows);
+          var res =  [result.rows.item(0).firstname, result.rows.item(0).lastname, result.rows.item(0).admnNo, result.rows.item(0).accessMethod];
           d.resolve(res);
       }
       else{
         d.reject();
       }
-      return d.promise;
+    }, function(err){
+      console.log("err user info");
+      console.log(err.message);
     });
+    return d.promise;
   };
 
   return self;
@@ -364,6 +367,93 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
     $cordovaSQLite.execute(db, query, [idArr[x]]).then(function(result){
       console.log("updated deviceLink to address");
       d.resolve();
+    });
+    return d.promise;
+  };
+  return self;
+});
+
+app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
+  var self;
+  self.appendPointsForGame = function(points, subject, topic, correct, wrong){
+    var uuid = $cordovaDevice.getUUID();
+    var d = $q.defer();
+    var query = "UPDATE user SET pointsTotal = pointsTotal + ?, pointsCurrent = pointsCurrent + ? WHERE deviceId = ?";
+    $cordovaSQLite.execute(db, query, [points, points, uuid]).then(function(res){
+      console.log("added points to table =  user");
+    }, function(err){
+      console.log(err.message);
+    });
+    query = "UPDATE qaSubjectStats SET points = points + ?, totalCorrect = totalCorrect + ?, totalWrong = totalWrong + ? WHERE subject = ?";
+    $cordovaSQLite.execute(db, query, [points, correct, wrong, subject]).then(function(res){
+      console.log("added points to table =  qaSubjectStats");
+    }, function(err){
+      console.log(err.message);
+    });
+    query = "UPDATE qaTopicStats SET points = points + ?, totalCorrect = totalCorrect + ?, totalWrong = totalWrong + ? WHERE topic = ?";
+    $cordovaSQLite.execute(db, query, [points, correct, wrong, topic]).then(function(res){
+      console.log("added points to table =  qaTopicStats");
+    }, function(err){
+      console.log(err.message);
+    });
+    var rawDate = new Date();
+    var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+    query = "UPDATE timeWiseStats SET score = score + ? WHERE date = ?";
+    $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
+      console.log(res.insertId);
+      console.log("updated timeWiseStats " + dateToday);
+      d.resolve();
+    }, function(err){
+      console.log(err.messsge);
+      query = "INSERT INTO timeWiseStats (score, date) VALUES (?, ?)";
+      $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
+        console.log(res.insertId);
+        console.log("inserted into timeWiseStats " + dateToday);
+        d.resolve();
+      }, function(err){
+        console.log(err.message);
+      });
+    });
+    return d.promise;
+  };
+  return self;
+});
+
+app.factory('DbLeaderboard', function($q, $cordovaSQLite){
+  db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+  var self = {
+    today: 0,
+    week: 0,
+    month: 0
+  };
+  var db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+  self.getScoreData = function(){
+    var d = $q.defer();
+    var query = "SELECT * FROM timeWiseStats";
+    $cordovaSQLite.execute(db, query).then(function(res){
+      console.log(res.insertId);
+      var rawDate = new Date();
+      var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+      for(var x = 0; x < res.rows.length; x++){
+        var someDay = new Date(String(res.row.item(x).date));
+        var timeDiff = Math.abs(dateToday.getTime() - someDay.getTime());
+        var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        if(diffDays < 1){
+          self.today += res.row.item(x).score;
+          self.week += res.row.item(x).score;
+          self.month += res.row.item(x).score;
+        }
+        else if(diffDays < 7){
+          self.week += res.row.item(x).score;
+          self.month += res.row.item(x).score;
+        }
+        else if(diffDays < 30){
+          self.month += res.row.item(x).score;
+        }
+      }
+      d.resolve();
+    }, function(err){
+      console.log(err.message);
     });
     return d.promise;
   };

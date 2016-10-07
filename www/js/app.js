@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 var db = null;
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller'])
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
@@ -21,22 +21,49 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    var dbDel = function(date){
+      var query = "DELETE FROM timeWiseStats WHERE date = ?";
+      $cordovaSQLite.execute(db, query, [date]).then(function(res){
+        console.log(res.insertId);
+      }, function(err){
+        console.log(err.message);
+      });
+    };
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, accessMethod text, pointsEarned Int, pointsCurrent Int ,level Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, onDevice Bit, supportMaterial text, id Int, deviceLink text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, accessMethod text, pointsTotal Int DEFAULT 0, pointsCurrent Int DEFAULT 0, level Int DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, supportMaterial text, id Int, deviceLink text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, supportMaterial text, id Int, deviceLink text)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, supportMaterial text, id Int, deviceLink text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaLevels (subject text, chapter text, topic text, level Tinyint)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS questionBookmarks (subject text, chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaSubjectStats (subject text, points Int, totalCorrect Int, totalWrong Int, )");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaTopicStats (topic text, points Int, totalCorrect Int, totalWrong Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS timeWiseStats (twoDayPoints Int, weekPoints Int, monthPoints Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaLevels (subject text, chapter text, topic text, level Tinyint DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS questionBookmarks (subject text, chapter text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaSubjectStats (subject text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaTopicStats (topic text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS timeWiseStats (score Int, date text, id PRIMARY KEY AUTOINCREMENT)");
+    $cordovaSQLite.execute(db, "SELECT * FROM timeWiseStats").then(function(res){
+      if(res.rows.length > 0){
+        var rawDate = new Date();
+        var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+        for(var x = 0; x < res.row.length; x++){
+          var someDay = new Date(String(res.row.item(x).date));
+          var timeDiff = Math.abs(dateToday.getTime() - someDay.getTime());
+          var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+          if(diffDays >= 30){
+            dbDel(res.row.item(x).date);
+          }
+        }
+      }
+      else{
+        console.log("nothing in time wise stats");
+      }
+    }, function(err){
+      console.log(err.message);
+    });
   });
 })
 
@@ -160,11 +187,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.bookmarks', {
-    url: '/bookmarks/',
+    url: '/bookmarks',
     views: {
       'menuContent': {
         templateUrl: 'templates/bookmarks.html',
         controller: 'BookmarkCtrl'
+      }
+    }
+  })
+
+  .state('app.leaderboard', {
+    url: '/leaderboard',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/leaderboard.html',
+        controller: 'LeaderboardCtrl'
       }
     }
   });
