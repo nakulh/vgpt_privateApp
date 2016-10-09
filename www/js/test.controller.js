@@ -1,9 +1,11 @@
 var app = angular.module('test.controller', ['db.service', 'test.service']);
-app.controller('TestListCtrl', function($scope, DbTest, TestUpdate){
+app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   $scope.submit = function(code){
     DbTest.checkCode(code).then(function(res){
       if(res){
-        //code for redirect
+        console.log("correct test code redirecting......");
+        var path = "/testlist/" + code;
+      //  $location.path(path);
       }
       else{
         $scope.message = "incorrect password!";

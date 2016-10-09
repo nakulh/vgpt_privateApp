@@ -1,4 +1,18 @@
 <ion-view view-title="test">
   <ion-content>
+    <div class="list">
+      <div class="item item-input-inset">
+        <label class="item-input-wrapper">
+          <input type="text" placeholder="password" ng-model="password">
+        </label>
+        <button class="button button-small" ng-click="submit(password)">
+          Submit
+        </button>
+      </div>
+    </div>
+    <h3 ng-if="message">{{message}}</h3>
+    <button class="button button-small" ng-click="insertTest()">
+      insertTest
+    </button>
   </ion-content>
 </ion-view>
