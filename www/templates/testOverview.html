@@ -1,4 +1,8 @@
 <ion-view view-title="test">
   <ion-content>
+    <div ng-repeat="qArr in questions">
+      <h3>{{subjects[$index]}}</h3>
+      <div ng-repeat="q in qArr track by $index">{{q.num}}</div>
+    </div>
   </ion-content>
 </ion-view>

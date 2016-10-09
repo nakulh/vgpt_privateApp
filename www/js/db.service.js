@@ -489,5 +489,15 @@ app.factory('DbTest', function($q, $cordovaSQLite){
     });
     return d.promise;
   };
+  self.getTest = function(code){
+    var d = $q.defer();
+    var query = "SELECT * FROM " + code;
+    $cordovaSQLite.execute(db, query).then(function(res){
+      d.resolve(res.rows);
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
   return self;
 });
