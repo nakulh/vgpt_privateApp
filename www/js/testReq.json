@@ -1,9 +1,13 @@
 {
-  "password": "76765i675fyj",
+  "time": 900000,
+  "name": "Jee Adv mock",
+  "password": "nakul",
   "subjects": ["maths", "physics", "chemistry"],
+  "date": "january 2016",
   "maths": [
     {
       "question": "eryhgy5",
+      "type": "single",
       "a": "a",
       "b": "b",
       "c": "c",
@@ -13,66 +17,76 @@
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 4
     },
     {
       "question": "efsfsf",
+      "type": "multiple",
       "a": "a",
       "b": "b",
       "c": "c",
       "d": "d",
-      "answer": "a",
+      "answer": ["a", "b"],
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 2
     }
   ],
   "physics": [
     {
       "question": "eryhgy5",
+      "type": "integer",
       "a": "a",
       "b": "b",
       "c": "c",
       "d": "d",
-      "answer": "a",
+      "answer": 4,
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 4
     },
     {
       "question": "efsfsf",
+      "type": "multiple",
       "a": "a",
       "b": "b",
       "c": "c",
       "d": "d",
-      "answer": "a",
+      "answer": ["a", "c"],
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 6
     }
   ],
   "chemistry": [
     {
       "question": "eryhgy5",
+      "type": "integer",
       "a": "a",
       "b": "b",
       "c": "c",
       "d": "d",
-      "answer": "a",
+      "answer": 0,
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 4
     },
     {
       "question": "efsfsf",
+      "type": "single",
       "a": "a",
       "b": "b",
       "c": "c",
@@ -82,7 +96,8 @@
       "aImg": null,
       "bimg": null,
       "cImg": null,
-      "dImg": null
+      "dImg": null,
+      "marks": 8
     }
   ]
 }

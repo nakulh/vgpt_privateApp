@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 var db = null;
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller', 'test.controller'])
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
@@ -45,6 +45,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaSubjectStats (subject text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaTopicStats (topic text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS timeWiseStats (score Int, date text, id PRIMARY KEY AUTOINCREMENT)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS testsInfo (taken Bit, date text, password text, name text, subjects text, time Int, elapsedTime Int, correct Int, wrong Int, score Int, uploaded Bit)");
     $cordovaSQLite.execute(db, "SELECT * FROM timeWiseStats").then(function(res){
       if(res.rows.length > 0){
         var rawDate = new Date();
@@ -202,6 +203,46 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
       'menuContent': {
         templateUrl: 'templates/leaderboard.html',
         controller: 'LeaderboardCtrl'
+      }
+    }
+  })
+
+  .state('app.testList', {
+    url: '/testlist',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/testList.html',
+        controller: 'TestListCtrl'
+      }
+    }
+  })
+
+  .state('app.testOverview', {
+    url: '/testlist/:password',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/testOverview.html',
+        controller: 'TestOverviewCtrl'
+      }
+    }
+  })
+
+  .state('app.testQuestion', {
+    url: '/testlist/:password/:question',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/testQuestion.html',
+        controller: 'TestQuestionCtrl'
+      }
+    }
+  })
+
+  .state('app.testEnd', {
+    url: '/testlist/end',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/testEnd.html',
+        controller: 'TestEndCtrl'
       }
     }
   });

@@ -22,10 +22,6 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
     var high = low + 10;
     Ranks.getPublicRanks(low, high, 1).then(function(ranks){
         $scope.dayRanks = $scope.dayRanks.concat(ranks);
-        if(ranks.length < 10){
-          $scope.disableDayScroll = true;
-        }
-        $scope.$broadcast('scroll.infiniteScrollComplete');
     });
   };
   $scope.loadWeek = function(){
@@ -33,10 +29,6 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
     var high = low + 10;
     Ranks.getPublicRanks(low, high, 7).then(function(ranks){
         $scope.weekRanks = $scope.weekRanks.concat(ranks);
-        if(ranks.length < 10){
-          $scope.disableWeekScroll = true;
-        }
-        $scope.$broadcast('scroll.infiniteScrollComplete');
     });
   };
   $scope.loadMonth = function(){
@@ -44,10 +36,6 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
     var high = low + 10;
     Ranks.getPublicRanks(low, high, 30).then(function(ranks){
         $scope.monthRanks = $scope.monthRanks.concat(ranks);
-        if(ranks.length < 10){
-          $scope.disableMonthScroll = true;
-        }
-        $scope.$broadcast('scroll.infiniteScrollComplete');
     });
   };
   $scope.loadDay();

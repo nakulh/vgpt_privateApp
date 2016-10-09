@@ -459,3 +459,35 @@ app.factory('DbLeaderboard', function($q, $cordovaSQLite){
   };
   return self;
 });
+
+app.factory('DbTest', function($q, $cordovaSQLite){
+  var self = {};
+  db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+  self.getPreviousTests = function(){
+    var d = $q.defer();
+    var query = "SELECT * from testsInfo where taken = 1";
+    $cordovaSQLite.execute(db, query).then(function(res){
+      self.previousTests = res.rows;
+      d.resolve();
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  self.checkCode = function(code){
+    var d = $q.defer();
+    var query = "SELECT name from testsInfo where password = ?";
+    $cordovaSQLite.execute(db, query, code).then(function(res){
+      if(res.rows.length > 0){
+        d.resolve(true);
+      }
+      else{
+        d.resolve(false);
+      }
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  return self;
+});
