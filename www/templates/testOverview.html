@@ -2,7 +2,12 @@
   <ion-content>
     <div ng-repeat="qArr in questions">
       <h3>{{subjects[$index]}}</h3>
-      <div ng-repeat="q in qArr track by $index">{{q.num}}</div>
+      <button ng-href="#/app/testlist/{{password}}/{{q.subject}}/{{q.num}}" ng-click="openQuestion(q.subject, q.num)"
+        class="button button-outline"
+        ng-class="{'button-balanced': q.answered, 'button-energized': q.review, 'button-assertive': !q.userAns, 'button-dark': q.review && q.answered}"
+        ng-repeat="q in qArr track by $index">
+        {{q.num}}
+      </button>
     </div>
   </ion-content>
 </ion-view>

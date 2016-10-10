@@ -1,4 +1,35 @@
 <ion-view view-title="test">
   <ion-content>
+    <div class="list card">
+      <div class="item item-body">
+        <p>
+          {{question.question}}
+        </p>
+      </div>
+    </div>
+    <ion-list ng-if="question.type == 'single'">
+      <ion-radio ng-model="userAns" ng-value="'a'">{{question.A}}</ion-radio>
+      <ion-radio ng-model="userAns" ng-value="'b'">{{question.B}}</ion-radio>
+      <ion-radio ng-model="userAns" ng-value="'c'">{{question.C}}</ion-radio>
+      <ion-radio ng-model="userAns" ng-value="'d'">{{question.D}}</ion-radio>
+    </ion-list>
+    <ion-list ng-if="question.type == 'multiple'">
+      <ion-checkbox ng-model="userAns.a">{{question.A}}</ion-checkbox>
+      <ion-checkbox ng-model="userAns.b">{{question.B}}</ion-checkbox>
+      <ion-checkbox ng-model="userAns.c">{{question.C}}</ion-checkbox>
+      <ion-checkbox ng-model="userAns.d">{{question.D}}</ion-checkbox>
+    </ion-list>
+    <div class="list list-inset" ng-if="question.type == 'integer'">
+      <label class="item item-input">
+        <input type="text" placeholder="Integer" ng-model="userAns">
+      </label>
+    </div>
+    <div class="button-bar">
+      <a ng-if="prevButton" ng-click="previous()" class="button button-positive">Prev</a>
+      <a ng-click="saveQuestion(userAns)" class="button button-positive">Save</a>
+      <a ng-click="unsaveQuestion()" class="button button-positive">Unsave</a>
+      <a ng-if="nextButton" ng-click="next()" class="button button-positive">Next</a>
+    </div>
+    <a class="button button-positive" ng-click="reviewLater()">Review Later</a>
   </ion-content>
 </ion-view>

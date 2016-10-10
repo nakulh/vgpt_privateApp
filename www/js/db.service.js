@@ -493,6 +493,7 @@ app.factory('DbTest', function($q, $cordovaSQLite){
     var d = $q.defer();
     var query = "SELECT * FROM " + code;
     $cordovaSQLite.execute(db, query).then(function(res){
+      console.log("length of data" + res.rows.length);
       d.resolve(res.rows);
     }, function(err){
       console.log(err.message);

@@ -1,12 +1,12 @@
 {
   "time": 900000,
   "name": "Jee Adv mock",
-  "password": "nakul",
+  "password": "nakulh",
   "subjects": ["maths", "physics", "chemistry"],
   "date": "january 2016",
   "maths": [
     {
-      "question": "eryhgy5",
+      "question": "m1 a",
       "type": "single",
       "a": "a",
       "b": "b",
@@ -18,10 +18,11 @@
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 4
+      "marks": 4,
+      "negativeMarks": -1
     },
     {
-      "question": "efsfsf",
+      "question": "m2 a,b",
       "type": "multiple",
       "a": "a",
       "b": "b",
@@ -33,27 +34,25 @@
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 2
+      "marks": 2,
+      "negativeMarks": -1
     }
   ],
   "physics": [
     {
-      "question": "eryhgy5",
+      "question": "p1 4",
       "type": "integer",
-      "a": "a",
-      "b": "b",
-      "c": "c",
-      "d": "d",
       "answer": 4,
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 4
+      "marks": 4,
+      "negativeMarks": -2
     },
     {
-      "question": "efsfsf",
+      "question": "p2 a,c",
       "type": "multiple",
       "a": "a",
       "b": "b",
@@ -65,27 +64,25 @@
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 6
+      "marks": 6,
+      "negativeMarks": -3
     }
   ],
   "chemistry": [
     {
-      "question": "eryhgy5",
+      "question": "c1 4",
       "type": "integer",
-      "a": "a",
-      "b": "b",
-      "c": "c",
-      "d": "d",
       "answer": 0,
       "questionImage": null,
       "aImg": null,
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 4
+      "marks": 4,
+      "negativeMarks": -1
     },
     {
-      "question": "efsfsf",
+      "question": "c2 a",
       "type": "single",
       "a": "a",
       "b": "b",
@@ -97,7 +94,8 @@
       "bimg": null,
       "cImg": null,
       "dImg": null,
-      "marks": 8
+      "marks": 8,
+      "negativeMarks": 0
     }
   ]
 }

@@ -228,7 +228,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.testQuestion', {
-    url: '/testlist/:password/:question',
+    url: '/testlist/:password/:subject/:question',
     views: {
       'menuContent': {
         templateUrl: 'templates/testQuestion.html',
