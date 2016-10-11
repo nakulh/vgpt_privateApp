@@ -1,4 +1,15 @@
-<ion-view view-title="test">
+<ion-view view-title="testEnd">
   <ion-content>
+    total = {{marks}} <br>
+    maths = {{subjectMarks[0]}}<br>
+    phy = {{subjectMarks[1]}}<br>
+    chem = {{subjectMarks[2]}}<br>
+    <div ng-repeat="b in q">
+      <div ng-repeat="a in b[$index]">
+        {{a.userAns || json}}
+        {{a.answer || json}}
+      </div>
+      <br>
+    </div>
   </ion-content>
 </ion-view>

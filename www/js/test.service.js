@@ -21,7 +21,7 @@ app.factory('TestUpdate', function($q, $http, $cordovaSQLite){
                 var q = questionsArr[y];
                 query = "INSERT INTO " + test.password + " (subject, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, marks, negativeMarks, type) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 var ans = q.answer.toString();
-                $cordovaSQLite.execute(db, query, [test.subjects[x], q.question, q.questionImage, q.a, q.aImg, q.b, q.bImg, q.c, q.cImg, q.d, q.dImg, q.ans, q.marks, q.negativeMarks, q.type]).then(function(res){
+                $cordovaSQLite.execute(db, query, [test.subjects[x], q.question, q.questionImage, q.a, q.aImg, q.b, q.bImg, q.c, q.cImg, q.d, q.dImg, ans, q.marks, q.negativeMarks, q.type]).then(function(res){
                   console.log("inserted question");
                 }, function(err){
                   console.log(err.message);

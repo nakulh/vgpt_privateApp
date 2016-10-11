@@ -238,7 +238,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.testEnd', {
-    url: '/testlist/end',
+    url: '/endTest',
     views: {
       'menuContent': {
         templateUrl: 'templates/testEnd.html',
