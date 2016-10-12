@@ -476,10 +476,10 @@ app.factory('DbTest', function($q, $cordovaSQLite){
   };
   self.checkCode = function(code){
     var d = $q.defer();
-    var query = "SELECT name FROM testsInfo WHERE password = ?";
+    var query = "SELECT * FROM testsInfo WHERE password = ?";
     $cordovaSQLite.execute(db, query, [code]).then(function(res){
       if(res.rows.length > 0){
-        d.resolve(true);
+        d.resolve(res.rows.item(0));
       }
       else{
         d.resolve(false);
@@ -499,6 +499,44 @@ app.factory('DbTest', function($q, $cordovaSQLite){
       console.log(err.message);
     });
     return d.promise;
+  };
+  self.getTestInfo = function(code){
+    var d = $q.defer();
+    var query = "SELECT * FROM testsInfo WHERE password = ?";
+    $cordovaSQLite.execute(db, query, [code]).then(function(res){
+      if(res.rows.length > 0){
+        d.resolve(res.rows.item(0));
+      }
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  self.editStats = function(code, score){
+    var query = "SELECT * FROM testsInfo WHERE password = ?";
+    $cordovaSQLite.execute(db, query, [code]).then(function(res){
+      if(!res.rows.item(0).taken){
+        query = "UPDATE testsInfo SET taken = 1, score = ? WHERE password = '" + code + "'";
+        $cordovaSQLite.execute(db, query, [score]).then(function(res){
+          console.log("db: test is taken & scored");
+        }, function(err){
+          console.log(err.message);
+        });
+      }
+      else{
+        console.log("test is already taken");
+      }
+    }, function(err){
+      console.log(err.message);
+    });
+  };
+  self.storeTimeElapsed = function(code, time){
+    query = "UPDATE testsInfo SET elapsedTime = ? WHERE password = '" + code + "'";
+    $cordovaSQLite.execute(db, query, [time]).then(function(res){
+      console.log("db: updated elapsedTime " + time);
+    }, function(err){
+      console.log(err.message);
+    });
   };
   return self;
 });

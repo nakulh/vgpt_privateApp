@@ -2,13 +2,16 @@ var app = angular.module('test.controller', ['db.service', 'test.service']);
 app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   $scope.submit = function(code){
     DbTest.checkCode(code).then(function(res){
-      if(res){
+      if(!res.taken){
         console.log("correct test code redirecting......");
         var path = "/app/testlist/" + code;
         $location.path(path);
       }
-      else{
-        $scope.message = "incorrect password!";
+      else if(res.taken){
+        $scope.message = "Test Already taken!";
+      }
+      else if(!res){
+        $scope.message = "Incorrect Password";
       }
     });
   };
@@ -17,7 +20,8 @@ app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   };
 });
 
-app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestData, $location){
+app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestData, $location, $rootScope){
+  TestData.storePassword($stateParams.password);
   $scope.$on('$ionicView.enter', function() {
      console.log('Opened test overview!');
      if(TestData.dataPresent){
@@ -51,6 +55,29 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
     $scope.questions = questions;
     TestData.storeData(questions, subjects);
   });
+  var elapser = 0;
+  //Code for Clock
+  DbTest.getTestInfo($stateParams.password).then(function(testInfo){
+    $rootScope.timeLeft = testInfo.time - testInfo.elapsedTime;
+    elapser = $rootScope.timeLeft - 60000;
+    $rootScope.timer = setInterval(function(){
+      $rootScope.timeLeft -= 10000;
+      $scope.$apply();
+      if($rootScope.timeLeft <= 0){
+        $location.path("/app/endTest");
+        console.log("timeout");
+        //clearInterval($rootScope.timer);
+      }
+
+      //store elapsedTime every 1 min
+      if($rootScope.timeLeft < elapser){
+        elapser -= 60000;
+        DbTest.storeTimeElapsed($stateParams.password, testInfo.time - $rootScope.timeLeft);
+      }
+    }, 999);
+  });
+  //End code for clock
+
   $scope.openQuestion = function(subject, qNum){
     console.log(subject + qNum);
     var path = "/app/testlist/" + $stateParams.password + "/" + subject + "/" + qNum;
@@ -58,9 +85,23 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
   };
 });
 
-app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup){
-  $scope.prevButton = false;
-  $scope.nextButton = true;
+app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope){
+
+  //Code for handling visibility of next & prev button
+  if(TestData.subjects.indexOf($stateParams.subject) === 0 && $stateParams.question == 1){
+    $scope.prevButton = false;
+  }
+  else{
+    $scope.prevButton = true;
+  }
+  if(TestData.subjects.indexOf($stateParams.subject) == TestData.subjects.length-1 && $stateParams.question == TestData.questions[TestData.subjects.indexOf($stateParams.subject)].length){
+    $scope.nextButton = false;
+  }
+  else{
+    $scope.nextButton = true;
+  }
+  //END Code for handling visibility of next & prev button
+
   $scope.question = TestData.questions[TestData.subjects.indexOf($stateParams.subject)][$stateParams.question-1];
   var subject = $stateParams.subject;
   var questionNum = $stateParams.question-1;
@@ -75,10 +116,12 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
     TestData.storeData(TestData.questions, TestData.subjects);
   };
   $scope.unsaveQuestion = function(){
-    TestData.questions[TestData.subjects.indexOf(subject)][questionNum].userAns = false;
+    TestData.questions[TestData.subjects.indexOf(subject)][questionNum].userAns = null;
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].answered = false;
     TestData.storeData(TestData.questions, TestData.subjects);
   };
+
+  //Code for handling prev & next button
   $scope.next = function(){
     $scope.prevButton = true;
     if($scope.question.num >= TestData.questions[TestData.subjects.indexOf(subject)].length){
@@ -124,6 +167,8 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
       $scope.prevButton = true;
     }
   };
+  //END Code for handling prev & next button
+
   $scope.showConfirm = function() {
   var confirmPopup = $ionicPopup.confirm({
     title: 'End The Test?',
@@ -145,19 +190,21 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   };
 });
 
-app.controller('TestEndCtrl', function($scope, TestData){
+app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest){
+  clearInterval($rootScope.timer);
   var questions = TestData.questions;
   var marks = 0;
   var subjectMarks = [];
   var x = 0, y = 0;
+
   //Evaluate Test
   for(x = 0; x < questions.length; x++){
     subjectMarks.push(0);
     for(y = 0; y < questions[x].length; y++){
-      if(questions[x][y].type == "single"){
+      if(questions[x][y].type == "single" && questions[x][y].userAns !== null){
         subjectMarks[x] += questions[x][y].answer == questions[x][y].userAns ? questions[x][y].marks : questions[x][y].negativeMarks;
       }
-      else if(questions[x][y].type == "multiple" && questions[x][y].userAns){
+      else if(questions[x][y].type == "multiple" && questions[x][y].userAns && questions[x][y].userAns !== null){
         var userAns = questions[x][y].answer.split(",");
         var userAnsL = 0;
         var correct = true;
@@ -190,12 +237,13 @@ app.controller('TestEndCtrl', function($scope, TestData){
         }
         subjectMarks[x] += correct ? questions[x][y].marks : questions[x][y].negativeMarks;
       }
-      else if(questions[x][y].type == "integer"){
+      else if(questions[x][y].type == "integer" && questions[x][y].userAns !== null){
         subjectMarks[x] += questions[x][y].answer == questions[x][y].userAns ? questions[x][y].marks : questions[x][y].negativeMarks;
       }
     }
   }
-  var a = 0, b = 0;
+//End Test Evaluater
+  /*var a = 0, b = 0;
   for(a = 0; a < questions.length; a++){
     for(b = 0; b < questions[a].length; b++){
       //console.log("userAns " + questions[a][b].userAns);
@@ -208,10 +256,11 @@ app.controller('TestEndCtrl', function($scope, TestData){
       }
       console.log(strBuilder.join(""));
     }
-  }
+  }*/
   $scope.marks = 0;
   for(x in subjectMarks){
     $scope.marks += subjectMarks[x];
   }
+  DbTest.editStats(TestData.password, $scope.marks);
   $scope.subjectMarks = subjectMarks;
 });

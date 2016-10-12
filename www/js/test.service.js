@@ -47,5 +47,8 @@ app.factory('TestData', function($q){
   self.dataPresent = function(){
     return self.questions;
   };
+  self.storePassword = function(code){
+    self.password = code;
+  };
   return self;
 });
