@@ -540,3 +540,25 @@ app.factory('DbTest', function($q, $cordovaSQLite){
   };
   return self;
 });
+
+app.factory('DbDpp', function($q, $cordovaSQLite){
+  db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+  self = {};
+  self.getDppList = function(subject, topic){
+    var d = $q.defer();
+    var query = "SELECT * FROM " + subject + "Material WHERE topic = ?";
+    $cordovaSQLite.execute(db, query, [topic]).then(function(res){
+      if(res.rows.length > 0){
+        console.log("db: getting dpp " + topic);
+        d.resolve(res.rows);
+      }
+      else{
+        console.log("dpp empty");
+      }
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  return self;
+});

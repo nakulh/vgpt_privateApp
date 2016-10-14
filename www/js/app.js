@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 var db = null;
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller', 'test.controller'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller', 'test.controller', 'dpp.controller'])
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
@@ -243,6 +243,34 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
       'menuContent': {
         templateUrl: 'templates/testEnd.html',
         controller: 'TestEndCtrl'
+      }
+    }
+  })
+
+  .state('app.dppSubject', {
+    url: '/dpp',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/dppSubjects.html',
+      }
+    }
+  })
+
+  .state('app.dppTopic', {
+    url: '/dpp/:subject',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/dppTopics.html',
+        controller: 'dppTopicCtrl'
+      }
+    }
+  })
+  .state('app.dppList', {
+    url: '/dpp/:subject/:topic',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/dppList.html',
+        controller: 'dppListCtrl'
       }
     }
   });

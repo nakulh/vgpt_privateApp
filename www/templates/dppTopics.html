@@ -1,0 +1,8 @@
+<ion-view view-title="dpp topics list">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="topic in topics" href="#/app/dpp/{{subject}}/{{dppLink[$index]}}">{{topic}}</ion-item>
+    </ion-list>
+    <button ng-click="addDpp()" class="button">add dpp</button>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,11 @@
+<ion-view view-title="dpp list">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="dpp in dpps">
+        {{dpp.title}}
+        <h3 class="royal">{{dpp.description}}</h3>
+        <button class="button button-positive button-small" ng-click="dpp.open()">open</button>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>
