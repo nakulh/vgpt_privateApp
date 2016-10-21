@@ -340,7 +340,6 @@ app.factory('DbBookmarks', function($q, $cordovaSQLite){
 
 app.factory('DbVideos', function($q, $cordovaSQLite){
   var self = {};
-
   //get full list of videos for specific topic/chapter
   self.getVideosList = function(subject, topic){
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
@@ -349,20 +348,16 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
       chemistry: "chemistryVideos",
       maths: "mathsVideos"
     };
-    console.log(subject);
-    console.log(topic);
     var d = $q.defer();
     self.videosList = [];
-    var query = "SELECT chapter, topic, source, intranetLink, internetLink, title, description, onDevice, supportMaterial, id, deviceLink FROM '" + dbObj[subject] + "' WHERE chapter = ?";
+    var query = "SELECT chapter, topic, source, intranetLink, internetLink, title, description, deviceLink FROM '" + dbObj[subject] + "' WHERE topic = ?";
     $cordovaSQLite.execute(db, query, [topic]).then(function(result){
       d.resolve();
       if(result.rows.length > 0){
-        console.log(result.rows.item(0).title);
         console.log(result.rows.length);
         self.videosList = result.rows;
       }
       else{
-        self.videosList = false;
         console.log("no videos");
       }
     });
@@ -397,7 +392,7 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
   };
 
   //Set local storage address for videos
-  self.updateDeviceLink = function(video, subject, address){
+  self.updateDeviceLink = function(subject, address, id){
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
       physics: "physicsVideos",
@@ -405,12 +400,31 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
       maths: "mathsVideos"
     };
     var d = $q.defer();
-    var query = "UPDATE " + dbObj[subject] + " SET deviceLink = " + address + " WHERE id = ?";
-    $cordovaSQLite.execute(db, query, [idArr[x]]).then(function(result){
-      console.log("updated deviceLink to address");
+    var rawDate = new Date();
+    var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+    var query = "UPDATE " + dbObj[subject] + " SET deviceLink = ?, downloadDate = ? WHERE id = ?";
+    $cordovaSQLite.execute(db, query, [address, dateToday, id]).then(function(result){
+      console.log("updated deviceLink to address = " + address);
       d.resolve();
+    }, function(err){
+      console.log(err.message);
     });
     return d.promise;
+  };
+  self.removeVideo = function(id, subject){
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var dbObj = {
+      physics: "physicsVideos",
+      chemistry: "chemistryVideos",
+      maths: "mathsVideos"
+    };
+    var query = "UPDATE " + dbObj[subject] + " SET deviceLink = NULL, downloadDate = NULL WHERE id = ?";
+    $cordovaSQLite.execute(db, query, [id]).then(function(result){
+      console.log("deleted video from db");
+      d.resolve();
+    }, function(err){
+      console.log(err.message);
+    });
   };
   return self;
 });

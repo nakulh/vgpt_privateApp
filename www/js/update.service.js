@@ -1,13 +1,6 @@
-var app = angular.module('update.service', ['db.service']);
+var app = angular.module('update.service', []);
 app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFileTransfer, $cordovaFile, DbItemAdd){
   var self = {};
-  var random = function(){
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 5; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
-  };
   self.checkUpdates = function(){
     var d = $q.defer();
     DbServiceSettings.getUserInfo().then(function(userInfo){

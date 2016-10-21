@@ -1,8 +1,11 @@
 <ion-view view-title="VideosSubDir">
   <ion-content>
     <ion-list>
-      <ion-item ng-repeat="title in videos.title track by $index">
-        {{title}}
+      <ion-item ng-repeat="video in videos track by $index">
+        {{video.title}}
+        <h3 class="royal">{{video.description}}</h3>
+        <button ng-if="video.open" class="button button-positive button-small" ng-click="video.open()">open</button>
+        <button ng-if="video.download" class="button button-positive button-small" ng-click="video.download()">open</button>
       </ion-item>
     </ion-list>
   </ion-content>

@@ -1,18 +1,4 @@
 {
   "name": "vgpt",
-  "app_id": "",
-  "proxies": [
-    {
-      "path": "/question",
-      "proxyUrl": "http://192.168.1.100:8080/Laravel/VGPT/public/api/v1/question/view"
-    },
-    {
-      "path": "/video",
-      "proxyUrl": "http://192.168.1.100:8080/Laravel/VGPT/public/api/v1/video/view"
-    },
-    {
-      "path": "/dpp",
-      "proxyUrl": "http://192.168.1.100:8080/Laravel/VGPT/public/api/v1/dpp/batch/"
-    }
-  ]
+  "app_id": ""
 }

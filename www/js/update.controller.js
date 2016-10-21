@@ -1,4 +1,4 @@
-var app = angular.module('update.controller', ['update.service']);
+var app = angular.module('update.controller', ['update.service', 'db.service']);
 app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, DbItemAdd, $cordovaDevice, $cordovaSQLite, $http){
   $scope.checkQuestionUpdates = function(){
     var uuid = $cordovaDevice.getUUID();
