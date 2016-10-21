@@ -36,8 +36,6 @@ app.factory('DppService', function($q, $cordovaSQLite, $cordovaDevice, $http, $t
         console.log(filename);
         var url = res[x].url;
         var targetPath = cordova.file.externalApplicationStorageDirectory + filename;
-        var trustHosts = true;
-        var options = {};
         downloadDpp(filename, ext, url, targetPath, res[x]);
       }
       d.resolve();

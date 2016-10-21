@@ -85,7 +85,7 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
   };
 });
 
-app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope){
+app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope, $cordovaToast){
 
   //Code for handling visibility of next & prev button
   if(TestData.subjects.indexOf($stateParams.subject) === 0 && $stateParams.question == 1){
@@ -110,15 +110,18 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].userAns = userAns;
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].answered = true;
     TestData.storeData(TestData.questions, TestData.subjects);
+    $cordovaToast.show('Saved', 'short', 'center');
   };
   $scope.reviewLater = function(){
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].review = true;
     TestData.storeData(TestData.questions, TestData.subjects);
+    $cordovaToast.show('Marked for review', 'short', 'center');
   };
   $scope.unsaveQuestion = function(){
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].userAns = null;
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].answered = false;
     TestData.storeData(TestData.questions, TestData.subjects);
+    $cordovaToast.show('Unsaved', 'short', 'center');
   };
 
   //Code for handling prev & next button

@@ -26,12 +26,12 @@
     </div>
     <div class="button-bar">
       <a ng-if="prevButton" ng-click="previous()" class="button button-positive">Prev</a>
-      <a ng-click="saveQuestion(question.userAns)" class="button button-positive">Save</a>
-      <a ng-click="unsaveQuestion()" class="button button-positive">Unsave</a>
+      <a ng-if="!question.answered" ng-click="saveQuestion(question.userAns)" class="button button-positive">Save</a>
+      <a ng-if="question.answered" ng-click="unsaveQuestion()" class="button button-positive">Unsave</a>
       <a ng-if="nextButton" ng-click="next()" class="button button-positive">Next</a>
       <a ng-if="!nextButton" ng-click="showConfirm()" class="button button-assertive">End and Submit</a>
     </div>
-    <a class="button button-positive" ng-click="reviewLater()">Review Later</a>
+    <a ng-if="!question.review" class="button button-positive" ng-click="reviewLater()">Review Later</a>
     {{timeLeft}}
   </ion-content>
 </ion-view>

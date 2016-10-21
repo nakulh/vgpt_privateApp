@@ -52,41 +52,5 @@ app.factory('UpdateService', function($q, $http, DbServiceSettings, $cordovaFile
     });
     return d.promise;
   };
-  self.downloadUpdate = function(url, type){
-    var d = $q.defer;
-    if(type == "question"){
-      $http.get(url).then(function(data){
-        // TODO:
-      });
-    }
-    else{
-      var randomId = random();
-      var targetPath = cordova.file.externalDataDirectory + randomId + ".zip";
-      var trustHosts = true;
-      var options = {};
-      $cordovaFileTransfer.download(url, targetPath, options, trustHosts).then(function(result) {
-          console.log("success Download");
-          $cordovaZip.unzip(targetPath, cordova.file.externalDataDirectory).then(function(){
-            console.log('success Unzip');
-            $cordovaFile.removeFile(cordova.file.externalDataDirectory, randomId + ".zip").then(function(success){
-              console.log("deleted ZIP");
-              d.resolve();
-            });
-          }, function () {
-              console.log('error unzip');
-             }, function (progressEvent) {
-                self.unzipProgress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                });
-      }, function(err) {
-        console.log(err);
-        console.log("error Downloading");
-      }, function (progress) {
-        $timeout(function () {
-          self.downloadProgress = Math.round((progress.loaded / progress.total) * 100);
-        });
-      });
-    }
-    return d.promise;
-  };
   return self;
 });

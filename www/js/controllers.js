@@ -52,12 +52,14 @@ angular.module('starter.controllers', ['db.service'])
       $scope.modal.show();
     }
   };
-  $scope.save = function(firstname, lastname, admnNo){
+  $scope.save = function(firstname, lastname, admnNo, batch){
     var db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var uuid = $cordovaDevice.getUUID();
-    var query = "INSERT INTO user (firstname, lastname, admnNo, deviceId, accessMethod) VALUES (?, ?, ?, ?, ?)";
-    $cordovaSQLite.execute(db, query, [firstname, lastname, admnNo, uuid, "intranet"]).then(function(result){
+    var query = "INSERT INTO user (firstname, lastname, admnNo, deviceId, batch, accessMethod) VALUES (?, ?, ?, ?, ?, ?)";
+    $cordovaSQLite.execute(db, query, [firstname, lastname, admnNo, uuid, batch, "intranet"]).then(function(result){
       console.log("insert id = " + result.insertId);
+    }, function(err){
+      console.log(err.message);
     });
     console.log("uuid = " + uuid);
 

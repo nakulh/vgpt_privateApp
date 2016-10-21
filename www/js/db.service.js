@@ -48,10 +48,52 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
 
   return self;
 });
-app.factory('DbItemAdd', function($q, $cordovaSQLite){
+app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $timeout){
   var self = {};
+  self.downloading = true;
+  var downloadImage = function(url){
+    url = "http://192.168.1.100:8080/Laravel/VGPT/resources/" + url;
+    var trustHosts = true;
+    var options = {};
+    var filename = url.split("/").pop();
+    console.log("filename = " + filename);
+    var targetPath = cordova.file.externalApplicationStorageDirectory + filename;
+    $cordovaFileTransfer.download(url, targetPath, options, trustHosts)
+      .then(function(result) {
+        console.log("download complete from " + url);
+        self.downloading = false;
+      }, function(err) {
+        var strBuilder = [];
+        for(var key in err){
+              if (err.hasOwnProperty(key)) {
+                 strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+            }
+        }
+        console.log(strBuilder.join(""));
+      }, function (progress) {
+        $timeout(function () {
+          console.log((progress.loaded / progress.total) * 100);
+          self.downloading = true;
+        });
+      });
+  };
   self.addQuestion = function(question){
-    console.log("adding question");
+    console.log("start adding question");
+    if(question.questionImageUrl){
+      downloadImage(question.questionImageUrl);
+    }
+    if(question.aImageUrl){
+      downloadImage(question.aImageUrl);
+    }
+    if(question.bImageUrl){
+      downloadImage(question.bImageUrl);
+    }
+    if(question.cImageUrl){
+      downloadImage(question.cImageUrl);
+    }
+    if(question.dImageUrl){
+      downloadImage(question.dImageUrl);
+    }
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
       physics: 'physicsQuestions',
@@ -59,7 +101,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite){
       maths: 'mathsQuestions'
     };
     var d = $q.defer();
-    var query = "INSERT INTO " + dbObj[question.subject] + " (chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    var query = "INSERT INTO " + dbObj[question.subject.toLowerCase()] + " (chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $cordovaSQLite.execute(db, query, [question.chapter, question.question, question.questionImage,
                                        question.a, question.aImg, question.b, question.bImg, question.c, question.cImg,
                                        question.d, question.dImg, question.answer, question.level, 0, question.id])
@@ -85,8 +127,8 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite){
       maths: "mathsVideos"
     };
     var d = $q.defer();
-    var query = "INSERT INTO " + dbObj[video.subject] + " (chapter, source, intranetLink, internetLink, title, description, onDevice, supportMaterial, id, deviceLink) VALUES (?, ?, ?, ?, ?, ?,? ,? ,? ,?)";
-    $cordovaSQLite.execute(db, query, [video.chapter, video.source, video.intranetLink, video.internetLink, video.title, video.description, 0, null, video.id, null])
+    var query = "INSERT INTO " + dbObj[video.subject.toLowerCase()] + " (chapter, topic, intranetLink, internetLink, title, description, id) VALUES (?, ?, ?, ?, ? ,? ,?)";
+    $cordovaSQLite.execute(db, query, [video.chapter, video.topic, video.intranetLink, video.internetLink, video.title, video.description, video.id])
                             .then(function(result){
                               d.resolve();
                               console.log("insert id = " + result.insertId);
@@ -101,7 +143,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite){
                             });
     return d.promise;
   };
-  self.addStudyMaterial = function(file){
+  /*self.addStudyMaterial = function(file){
     console.log("adding studyMaterial");
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
@@ -125,7 +167,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite){
                               console.log(strBuilder.join(""));
                             });
     return d.promise;
-  };
+  };*/
   return self;
 });
 
@@ -271,10 +313,10 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
 
 app.factory('DbBookmarks', function($q, $cordovaSQLite){
   var self = {};
-  self.getBookmarks = function(subject){
+  self.getBookmarks = function(topic){
     var d = $q.defer();
-    var query = "SELECT * from questionBookmarks WHERE subject = ?";
-    $cordovaSQLite.execute(db, query, [subject]).then(function(result){
+    var query = "SELECT * from questionBookmarks WHERE topic = ?";
+    $cordovaSQLite.execute(db, query, [topic]).then(function(result){
         self.bookmarks = result.rows;
         d.resolve();
     }, function(err){
@@ -467,8 +509,7 @@ app.factory('DbTest', function($q, $cordovaSQLite){
     var d = $q.defer();
     var query = "SELECT * FROM testsInfo WHERE taken = 1";
     $cordovaSQLite.execute(db, query).then(function(res){
-      self.previousTests = res.rows;
-      d.resolve();
+      d.resolve(res.rows);
     }, function(err){
       console.log(err.message);
     });
