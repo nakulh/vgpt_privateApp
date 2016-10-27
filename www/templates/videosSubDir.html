@@ -5,7 +5,8 @@
         {{video.title}}
         <h3 class="royal">{{video.description}}</h3>
         <button ng-if="video.open" class="button button-positive button-small" ng-click="video.open()">open</button>
-        <button ng-if="video.download" class="button button-positive button-small" ng-click="video.download()">open</button>
+        <button ng-if="video.download" class="button button-positive button-small" ng-click="video.download()">download</button>
+        <button ng-if="video.delete" class="button button-positive button-small" ng-click="video.delete()">delete video</button>
       </ion-item>
     </ion-list>
   </ion-content>

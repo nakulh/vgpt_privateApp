@@ -28,12 +28,12 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
     var uuid = $cordovaDevice.getUUID();
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var d  = $q.defer();
-    var query = "SELECT firstname, lastname, admnNo, accessMethod FROM user WHERE deviceId = ?";
+    var query = "SELECT firstname, lastname, admnNo, accessMethod, pointsTotal, batch, pointsCurrent FROM user WHERE deviceId = ?";
     $cordovaSQLite.execute(db, query, [uuid]).then(function(result){
       console.log("got user info");
       console.log(result.rows.item(0).firstname);
       if(result.rows.length > 0){
-          var res =  [result.rows.item(0).firstname, result.rows.item(0).lastname, result.rows.item(0).admnNo, result.rows.item(0).accessMethod];
+          var res =  [result.rows.item(0).firstname, result.rows.item(0).lastname, result.rows.item(0).admnNo, result.rows.item(0).accessMethod, result.rows.item(0).batch, result.rows.item(0).pointsTotal, result.rows.item(0).pointsCurrent];
           d.resolve(res);
       }
       else{
@@ -46,13 +46,25 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
     return d.promise;
   };
 
+  self.getSubjectPointsInfo = function(){
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    var d  = $q.defer();
+    var query = "SELECT * FROM qaSubjectStats";
+    $cordovaSQLite.execute(db, query).then(function(result){
+      d.resolve(result.rows);
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+
   return self;
 });
 app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $timeout){
   var self = {};
   self.downloading = true;
   var downloadImage = function(url){
-    url = "http://192.168.1.100:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.107:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();
@@ -101,8 +113,8 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
       maths: 'mathsQuestions'
     };
     var d = $q.defer();
-    var query = "INSERT INTO " + dbObj[question.subject.toLowerCase()] + " (chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $cordovaSQLite.execute(db, query, [question.chapter, question.question, question.questionImage,
+    var query = "INSERT INTO " + dbObj[question.subject.toLowerCase()] + " (chapter, topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $cordovaSQLite.execute(db, query, [question.chapter, question.topic, question.questions, question.questionImage,
                                        question.a, question.aImg, question.b, question.bImg, question.c, question.cImg,
                                        question.d, question.dImg, question.answer, question.level, 0, question.id])
                                        .then(function(result){
@@ -206,7 +218,7 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
       else{
         console.log("found no levels");
       }
-      query = "SELECT question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, wrong, id FROM physicsQuestions WHERE chapter = '" + chapter + "' AND level = " + self.level;
+      query = "SELECT question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, wrong, id FROM physicsQuestions WHERE topic = '" + chapter + "' AND level = " + self.level;
       console.log(query);
       $cordovaSQLite.execute(db, query).then(function(result){
         if(result.rows.length > 0){
@@ -350,7 +362,7 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
     };
     var d = $q.defer();
     self.videosList = [];
-    var query = "SELECT chapter, topic, source, intranetLink, internetLink, title, description, deviceLink FROM '" + dbObj[subject] + "' WHERE topic = ?";
+    var query = "SELECT chapter, topic, source, intranetLink, internetLink, title, description, deviceLink, id, downloadDate FROM '" + dbObj[subject] + "' WHERE topic = ?";
     $cordovaSQLite.execute(db, query, [topic]).then(function(result){
       d.resolve();
       if(result.rows.length > 0){
@@ -376,11 +388,11 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
     console.log(video);
     var d = $q.defer();
     self.video = [];
-    var query = "SELECT chapter, topic, source, intranetLink, internetLink, title, description, onDevice, supportMaterial, id, deviceLink FROM '" + dbObj[subject] + "' WHERE title = ?";
+    var query = "SELECT chapter, topic, intranetLink, internetLink, title, description, id, deviceLink, downloadDate FROM '" + dbObj[subject] + "' WHERE title = ?";
     $cordovaSQLite.execute(db, query, [video]).then(function(result){
       d.resolve();
       if(result.rows.length > 0){
-        console.log(result.rows);  //result.rows.item[0].question
+        console.log(result.rows);
         self.videosList = result.rows;
       }
       else{
@@ -430,7 +442,7 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
 });
 
 app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
-  var self;
+  var self = {};
   self.appendPointsForGame = function(points, subject, topic, correct, wrong){
     var uuid = $cordovaDevice.getUUID();
     var d = $q.defer();

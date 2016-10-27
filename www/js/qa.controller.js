@@ -20,7 +20,7 @@ app.controller('QaStatsCtrl', function($scope){
 
 });
 
-app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStorage, $state, $timeout){
+app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStorage, $state, $timeout, $cordovaToast){
   var Question = function(q){
     this.subject = $stateParams.subject;
     this.question = q.question;
@@ -40,93 +40,106 @@ app.controller('QaGameCtrl', function($scope, $stateParams, DbQuestions, QaStora
   DbQuestions.getQuestions($stateParams.subject, $stateParams.chapter).then(function(){ //Get questions from db
     console.log("got back");
     var cards = [];
-    for(var x = 0; x < DbQuestions.questions.length; x++){
-      cards.push(new Question(DbQuestions.questions.item(x)));
-    }
-    switch(DbQuestions.level){
-      case 0:
-        for(x = 0; x < DbQuestions.questions.length; x++){
-          cards[x].timing = 3*6*1000;
-          cards[x].ppoints = cards[x].wrong > 0 ? 5 : 10;
-          cards[x].npoints = -2;
-        }
-        console.log("set lvl 0");
-        break;
-      case 1:
-        for(x = 0; x < DbQuestions.questions.length; x++){
-          cards[x].timing = 5*60*1000;
-          cards[x].ppoints = cards[x].wrong > 0 ? 10 : 25;
-          cards[x].npoints = -5;
-        }
-        console.log("set lvl 1");
-        break;
-      case 2:
-        for(x = 0; x < DbQuestions.questions.length; x++){
-          cards[x].timing = 10*60*1000;
-          cards[x].ppoints = cards[x].wrong > 0 ? 50 : 100;
-          cards[x].npoints = -25;
-        }
-        console.log("set lvl 2");
-        break;
-      case 3:
-        for(x = 0; x < DbQuestions.questions.length; x++){
-          cards[x].timing = 15*60*1000;
-          cards[x].ppoints = cards[x].wrong > 0 ? 300 : 500;
-          cards[x].npoints = -200;
-        }
-        console.log("set lvl 3");
-        break;
-      default:
-        console.log("error in points config");
-        break;
-    }
-    $scope.totalCards = cards.length;
-    $scope.counter = 0;
-    $scope.card = cards[$scope.counter];
+    console.log("q = " + DbQuestions.questions.length);
+    if(DbQuestions.questions.length >= 1){
+      for(var x = 0; x < DbQuestions.questions.length; x++){
+        cards.push(new Question(DbQuestions.questions.item(x)));
+      }
+      DbQuestions.level = parseInt(DbQuestions.level);
+      switch(DbQuestions.level){
+        case 0:
+          for(x = 0; x < DbQuestions.questions.length; x++){
+            cards[x].timing = 3*6*1000;
+            cards[x].ppoints = cards[x].wrong > 0 ? 5 : 10;
+            cards[x].npoints = -2;
+          }
+          console.log("set lvl 0");
+          break;
+        case 1:
+          for(x = 0; x < DbQuestions.questions.length; x++){
+            cards[x].timing = 5*60*1000;
+            cards[x].ppoints = cards[x].wrong > 0 ? 10 : 25;
+            cards[x].npoints = -5;
+          }
+          console.log("set lvl 1");
+          break;
+        case 2:
+          for(x = 0; x < DbQuestions.questions.length; x++){
+            cards[x].timing = 10*60*1000;
+            cards[x].ppoints = cards[x].wrong > 0 ? 50 : 100;
+            cards[x].npoints = -25;
+          }
+          console.log("set lvl 2");
+          break;
+        case 3:
+          for(x = 0; x < DbQuestions.questions.length; x++){
+            cards[x].timing = 15*60*1000;
+            cards[x].ppoints = cards[x].wrong > 0 ? 300 : 500;
+            cards[x].npoints = -200;
+          }
+          console.log("set lvl 3");
+          break;
+        default:
+          console.log("error in points config");
+          break;
+      }
+      $scope.totalCards = cards.length;
+      $scope.counter = 0;
+      $scope.card = cards[$scope.counter];
 
-    var timeout = $timeout(function(){
-      $scope.next(false);
-      console.log("timeout");
-    }, $scope.card.timing);
-    $scope.card.timing /= 1000;
-    var timer = setInterval(function(){
-      $scope.card.timing -= 1;
-      $scope.$apply();
-    }, 1000);
-
-    $scope.next = function(userAns){
-      $timeout.cancel(timeout);
-      clearInterval(timer);
-      $scope.card = cards[++$scope.counter];
-      cards[$scope.counter-1].userAns = userAns;
-      $scope.userAns = false;
-      timeout = $timeout(function(){
-        if($scope.counter < DbQuestions.questions.length - 1){
-          $scope.next(false);
-        }
-        else {
-          $scope.end(false);
-        }
+      var timeout = $timeout(function(){
+        $scope.next(false);
         console.log("timeout");
       }, $scope.card.timing);
       $scope.card.timing /= 1000;
-      timer = setInterval(function(){
+      var timer = setInterval(function(){
         $scope.card.timing -= 1;
         $scope.$apply();
       }, 1000);
-    };
 
-    $scope.end = function(userAns){
-      console.log("ending game");
-      cards[$scope.counter].userAns = userAns;
-      QaStorage.storeQuestions(cards, DbQuestions.level);
-      $state.go('app.qaGameEnd');
-    };
-    $scope.bookmark = function(){
-      DbQuestions.bookmark(cards[$scope.counter]).then(function(bookmarked){
-        console.log(bookmarked);
+      $scope.next = function(userAns){
+        $timeout.cancel(timeout);
+        clearInterval(timer);
+        $scope.card = cards[++$scope.counter];
+        cards[$scope.counter-1].userAns = userAns;
+        $scope.userAns = false;
+        timeout = $timeout(function(){
+          if($scope.counter < DbQuestions.questions.length - 1){
+            $scope.next(false);
+          }
+          else {
+            $scope.end(false);
+          }
+          console.log("timeout");
+        }, $scope.card.timing);
+        $scope.card.timing /= 1000;
+        timer = setInterval(function(){
+          $scope.card.timing -= 1;
+          $scope.$apply();
+        }, 1000);
+      };
+
+      $scope.end = function(userAns){
+        console.log("ending game");
+        cards[$scope.counter].userAns = userAns;
+        QaStorage.storeQuestions(cards, DbQuestions.level);
+        $state.go('app.qaGameEnd');
+      };
+      $scope.bookmark = function(){
+        DbQuestions.bookmark(cards[$scope.counter]).then(function(bookmarked){
+          console.log(bookmarked);
+        });
+      };
+    }
+    else{
+      $cordovaToast
+      .show('No Questions in this category yet!', 'long', 'center')
+      .then(function(success) {
+        // success
+      }, function (error) {
+        // error
       });
-    };
+    }
   });
 });
 

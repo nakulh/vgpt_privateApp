@@ -50,8 +50,14 @@ app.controller('dppListCtrl', function($scope, $stateParams, DbDpp, $cordovaFile
       };
     };
     $scope.dpps = [];
-    for(var x = 0; x < res.length; x++){
-      $scope.dpps.push(new Dpp(res.item(x)));
+    if(res.length >= 0){
+      for(var x = 0; x < res.length; x++){
+        $scope.dpps.push(new Dpp(res.item(x)));
+      }
+    }
+    else{
+      $cordovaToast
+        .show('No Dpps in this category yet', 'long', 'center');
     }
   });
 });

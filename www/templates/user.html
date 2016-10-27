@@ -1,0 +1,10 @@
+<ion-view view-title="dpp list">
+  <ion-content>
+    <ion-list>
+      <ion-item ng-repeat="subjectPoint in subjectPoints">
+        {{subjectPoint || json}}
+      </ion-item>
+    </ion-list>
+    {{user || json}}
+  </ion-content>
+</ion-view>
