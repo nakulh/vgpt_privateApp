@@ -1,4 +1,4 @@
-<ion-view view-title="dpp list">
+<!--<ion-view view-title="dpp list">
   <ion-content>
     <ion-list>
       <ion-item ng-repeat="dpp in dpps">
@@ -8,4 +8,16 @@
       </ion-item>
     </ion-list>
   </ion-content>
-</ion-view>
+</ion-view>-->
+<ion-view view-title="DPP List" >
+    <ion-content  class="sub_topics grey">
+       <div class=" no-padding" >
+         <div class="row" ng-repeat="dpp in dpps">
+           <item class="sub_topics_no lgrey">{{$index+1}}</item>
+           <a class="item item-text-wrap item-balanced sub_topics_item"  ng-click="dpp.open()">
+             {{dpp.title}}{{dpp.description}}
+          </a>
+        </div>
+      </div>
+    </ion-content>
+  </ion-view>

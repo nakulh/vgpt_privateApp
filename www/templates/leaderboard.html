@@ -3,7 +3,7 @@
     <ion-tab title="Today">
       <ion-content class="has-tabs-top">
         <ion-list>
-          <ion-item ng-repeat="dayRank in dayRanks">
+          <ion-item ng-repeat="dayRank in dayRanks track by $index">
             {{dayRank.username}}
             {{dayRank.rank}}
             {{dayRank.score}}

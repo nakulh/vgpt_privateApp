@@ -1,4 +1,4 @@
-<ion-view view-title="Bookmarks">
+<!--<ion-view view-title="Bookmarks">
   <ion-content>
     <div class="list card">
       <div class="item item-body">
@@ -14,4 +14,35 @@
       <ion-radio>{{question.D}}</ion-radio>
     </ion-list>
   </ion-content>
+</ion-view>-->
+<ion-view view-title="Question">
+    <ion-content class="grey" >
+
+        <div class="item card-item">
+            <div  id="box_shadow" class="card stable-bg ink ink-dark">
+                <div class="item item-text-wrap">
+                    <!--<span><strong>1.</strong></span>-->
+                    <strong>{{question.question}}</strong>
+                    <a class="image" ng-click="openImg(question.questionImage)" ng-if="question.questionImage">Open image
+                    </a>
+
+                    <!--<div class="card-footer text-right">
+
+                        <div class="pull-left">
+                            <i class="icon ion-clock"></i>3:00 min
+                        </div>
+                    </div>-->
+                  </div>
+                    <ion-list>
+                       <div class="item-text-wrap">
+                          <ion-checkbox><b>1.</b>{{question.A}}</ion-checkbox>
+                          <ion-checkbox><b>2.</b>{{question.B}}</ion-checkbox>
+                          <ion-checkbox><b>3.</b>{{question.C}}</ion-checkbox>
+                          <ion-checkbox><b>4.</b>{{question.D}}</ion-checkbox>
+                       </div>
+                    </ion-list>
+
+            </div>
+        </div>
+    </ion-content>
 </ion-view>

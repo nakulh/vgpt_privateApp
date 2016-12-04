@@ -1,5 +1,5 @@
 var app = angular.module('videos.controller', ['db.service']);
-var ip = "http://192.168.1.102:8080";
+var ip = "http://192.168.1.103:8080";
 var resUrl = ip + "/Laravel/VGPT/resources/";
 app.controller('VideosCtrl', function($scope){
 
@@ -21,13 +21,15 @@ app.controller('VideosDirCtrl', function($scope, $stateParams){
   $scope.subject = $stateParams.subject;
 });
 
-app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVideos, $cordovaFileOpener2, $cordovaFileTransfer, DbServiceSettings, $cordovaSQLite, $cordovaFile, $cordovaToast){
+app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $stateParams, DbVideos, $cordovaFileOpener2, $cordovaFileTransfer, DbServiceSettings, $cordovaSQLite, $cordovaFile, $cordovaToast){
+  //$scope.downloading = false;
   DbVideos.getVideosList($stateParams.subject, $stateParams.topic).then(function(){
     $scope.videos = [];
     var Video = function(video){
       for(var key in video){
         console.log(key);
       }
+      this.downloading = false;
       this.title = video.title;
       this.description = video.description;
       this.intranetLink = video.intranetLink;
@@ -56,14 +58,14 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
           $cordovaFile.removeFile(cordova.file.externalApplicationStorageDirectory, video.deviceLink.split("/").pop())
             .then(function (success) {
               console.log('removed video file');
-              DbVideos.removeVideo(DbVideos.videosList.item(x).id, $stateParams.subject);
+              DbVideos.removeVideo(video.id, $stateParams.subject);
             }, function (error) {
               console.log('error removing video file');
             });
         };
       }
       else{
-        this.download = function(){
+        this.download = function(index){
           DbServiceSettings.getUserInfo().then(function(res){
             if(res[3] == "intranet"){
               console.log("intranet");
@@ -73,9 +75,10 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
               var targetPath = cordova.file.externalApplicationStorageDirectory + filename;
               $cordovaFileTransfer.download(resUrl + video.intranetLink, targetPath, options, trustHosts)
                 .then(function(result) {
+                  $scope.videos[index].downloading = false;
+                  //$scope.downloading = false;
                   console.log("download complete from " + resUrl + video.intranetLink);
                   DbVideos.updateDeviceLink($stateParams.subject, targetPath, video.id);
-                  video.deviceLink = targetPath;
                   this.open = function(){
                     var mime = "video/" + video.deviceLink.split(".").pop();
                     $cordovaFileOpener2.open(
@@ -94,11 +97,13 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
                         console.log(strBuilder.join(""));
                     });
                   };
+                  video.deviceLink = targetPath;
                   this.delete = function(){
                     $cordovaFile.removeFile(cordova.file.externalApplicationStorageDirectory, video.deviceLink.split("/").pop())
                       .then(function (success) {
                         console.log('removed video file');
                         DbVideos.removeVideo(DbVideos.videosList.item(x).id, $stateParams.subject);
+                        video.deviceLink = targetPath;
                       }, function (error) {
                         console.log('error removing video file');
                       });
@@ -106,9 +111,11 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
                 }, function(err) {
                     console.log(err);
                 }, function (progress) {
-                  $timeout(function () {
+                  $scope.videos[index].downloading = true;
+                  //$scope.downloading = true;
+                  /*$timeout(function () {
                     console.log((progress.loaded / progress.total) * 100);
-                  });
+                  });*/
                 });
             }
             else{
@@ -139,7 +146,7 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
     //var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
     if(DbVideos.videosList.length >= 0){
       for(var x = 0; x < DbVideos.videosList.length; x++){
-        if(DbVideos.videosList.item(x).downloadDate){
+        /*if(DbVideos.videosList.item(x).downloadDate){
           var someDay = new Date(String(DbVideos.videosList.item(x).downloadDate));
           var timeDiff = Math.abs(dateToday.getTime() - someDay.getTime());
           var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
@@ -152,7 +159,7 @@ app.controller('VideosSubDirCtrl', function($timeout, $scope, $stateParams, DbVi
                 console.log('error removing video file');
               });
           }
-        }
+        }*/
         $scope.videos.push(new Video(DbVideos.videosList.item(x)));
       }
     }

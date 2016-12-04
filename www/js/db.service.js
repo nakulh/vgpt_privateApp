@@ -2,7 +2,7 @@
 
 var db = null;
 var app = angular.module('db.service', []);
-app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
+app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice, $timeout){
   var self = {};
   //change access type: intranet or internet
   self.changeAccess = function(accessMethod){
@@ -25,24 +25,26 @@ app.factory('DbServiceSettings', function($q, $cordovaSQLite, $cordovaDevice){
 
   //Get basic user info
   self.getUserInfo = function(){
-    var uuid = $cordovaDevice.getUUID();
-    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    //var uuid = $cordovaDevice.getUUID();
     var d  = $q.defer();
-    var query = "SELECT firstname, lastname, admnNo, accessMethod, pointsTotal, batch, pointsCurrent FROM user WHERE deviceId = ?";
-    $cordovaSQLite.execute(db, query, [uuid]).then(function(result){
-      console.log("got user info");
-      console.log(result.rows.item(0).firstname);
-      if(result.rows.length > 0){
-          var res =  [result.rows.item(0).firstname, result.rows.item(0).lastname, result.rows.item(0).admnNo, result.rows.item(0).accessMethod, result.rows.item(0).batch, result.rows.item(0).pointsTotal, result.rows.item(0).pointsCurrent];
-          d.resolve(res);
-      }
-      else{
-        d.reject();
-      }
-    }, function(err){
-      console.log("err user info");
-      console.log(err.message);
-    });
+    $timeout(function(){
+      db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+      var query = "SELECT firstname, lastname, admnNo, accessMethod, pointsTotal, batch, pointsCurrent, correct, weekRank, todayRank, monthRank, wrong FROM user";
+      $cordovaSQLite.execute(db, query).then(function(result){
+        console.log("got user info");
+        console.log(result.rows.item(0).firstname);
+        if(result.rows.length > 0){
+            var res =  [result.rows.item(0).firstname, result.rows.item(0).lastname, result.rows.item(0).admnNo, result.rows.item(0).accessMethod, result.rows.item(0).batch, result.rows.item(0).pointsTotal, result.rows.item(0).pointsCurrent, result.rows.item(0).correct, result.rows.item(0).wrong, result.rows.item(0).todayRank, result.rows.item(0).weekRank, result.rows.item(0).monthRank];
+            d.resolve(res);
+        }
+        else{
+          d.reject();
+        }
+      }, function(err){
+        console.log("err user info");
+        console.log(err.message);
+      });
+    }, 300);
     return d.promise;
   };
 
@@ -64,11 +66,11 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
   var self = {};
   self.downloading = true;
   var downloadImage = function(url){
-    url = "http://192.168.1.107:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.103:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();
-    console.log("filename = " + filename);
+    //console.log("filename = " + filename);
     var targetPath = cordova.file.externalApplicationStorageDirectory + filename;
     $cordovaFileTransfer.download(url, targetPath, options, trustHosts)
       .then(function(result) {
@@ -91,20 +93,40 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
   };
   self.addQuestion = function(question){
     console.log("start adding question");
-    if(question.questionImageUrl){
+    var filename = "";
+    if(question.questionImageUrl.length > 4){
       downloadImage(question.questionImageUrl);
+      filename = question.questionImageUrl.split("/").pop();
+      question.questionImage = cordova.file.externalApplicationStorageDirectory + filename;
+      console.log(question.questionImage);
     }
-    if(question.aImageUrl){
+    if(question.aImageUrl.length > 4){
       downloadImage(question.aImageUrl);
+      console.log("option IMG A");
+      filename = question.aImageUrl.split("/").pop();
+      question.aImg = cordova.file.externalApplicationStorageDirectory + filename;
+      console.log(question.aImageUrl);
     }
-    if(question.bImageUrl){
+    if(question.bImageUrl.length > 4){
+      console.log("option IMG B");
       downloadImage(question.bImageUrl);
+      filename = question.bImageUrl.split("/").pop();
+      question.bImg = cordova.file.externalApplicationStorageDirectory + filename;
+      console.log(question.bImageUrl);
     }
-    if(question.cImageUrl){
+    if(question.cImageUrl.length > 4){
+      console.log("option IMG C");
       downloadImage(question.cImageUrl);
+      filename = question.cImageUrl.split("/").pop();
+      question.cImg = cordova.file.externalApplicationStorageDirectory + filename;
+      console.log(question.cImageUrl);
     }
-    if(question.dImageUrl){
+    if(question.dImageUrl.length > 4){
+      console.log("option IMG D");
       downloadImage(question.dImageUrl);
+      filename = question.dImageUrl.split("/").pop();
+      question.dImg = cordova.file.externalApplicationStorageDirectory + filename;
+      console.log(question.dImageUrl);
     }
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
@@ -113,10 +135,12 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
       maths: 'mathsQuestions'
     };
     var d = $q.defer();
-    var query = "INSERT INTO " + dbObj[question.subject.toLowerCase()] + " (chapter, topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $cordovaSQLite.execute(db, query, [question.chapter, question.topic, question.questions, question.questionImage,
+    //question.compulsory = (question.compulsory) ? 1 : 0;
+    console.log(question.questions);
+    var query = "INSERT INTO " + dbObj[question.subject.toLowerCase()] + " (topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong, id, compulsory) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $cordovaSQLite.execute(db, query, [question.topic, question.questions, question.questionImage,
                                        question.a, question.aImg, question.b, question.bImg, question.c, question.cImg,
-                                       question.d, question.dImg, question.answer, question.level, 0, question.id])
+                                       question.d, question.dImg, question.answer, question.level, 0, question.id, question.imp])
                                        .then(function(result){
                                           d.resolve();
                                           console.log("insert id = " + result.insertId);
@@ -242,18 +266,42 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
     });
     return d.promise;
   };
-  self.addWrong = function(questionsArr, wrongArr, subject){
+  self.removeCompulsory = function(questionsArr, subject){
     var dbObj = {
       physics: "physicsQuestions",
       chemistry: "chemistryQuestions",
       maths: "mathsQuestions"
     };
     var d = $q.defer();
-    console.log("wronging " + wrongArr.length);
+    console.log("removing compulsory " + questionsArr.length);
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
-    for(x = 0; x < wrongArr.length; x++){
-      var query = "UPDATE " + dbObj[subject] + " SET wrong = " + wrongArr[x] + " WHERE question = ?";
-      $cordovaSQLite.execute(db, query, [questionsArr[x]]).then(function(result){
+    var editDb = function(query, question){
+      $cordovaSQLite.execute(db, query, [question]).then(function(result){
+        console.log(result.insertId);
+        console.log("removed");
+    }, function(err){
+        var strBuilder = [];
+        for(var key in err){
+              if (err.hasOwnProperty(key)) {
+                 strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+            }
+        }
+        console.log(strBuilder.join(""));
+        });
+    };
+    for(x = 0; x < questionsArr.length; x++){
+      var query = "UPDATE " + dbObj[subject] + " SET compulsory = 0 WHERE question = ?";
+      editDb(query, questionsArr[x]);
+    }
+  };
+  self.addWrong = function(questionsArr, wrongArr, subject){
+    var dbObj = {
+      physics: "physicsQuestions",
+      chemistry: "chemistryQuestions",
+      maths: "mathsQuestions"
+    };
+    var editDb = function(query, question){
+      $cordovaSQLite.execute(db, query, [question]).then(function(result){
         console.log(result.insertId);
       }, function(err){
         var strBuilder = [];
@@ -264,6 +312,13 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
         }
         console.log(strBuilder.join(""));
       });
+    };
+    var d = $q.defer();
+    console.log("wronging " + wrongArr.length);
+    db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
+    for(x = 0; x < wrongArr.length; x++){
+      var query = "UPDATE " + dbObj[subject] + " SET wrong = " + wrongArr[x] + " WHERE question = ?";
+      editDb(query, questionsArr[x]);
     }
     d.resolve();
     console.log("wronged all");
@@ -276,13 +331,16 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
   };
   self.bookmark = function(q){
     var d = $q.defer();
-    var insertArr = [q.subject, q.chapter, q.question, q.questionImage, q.A, q.AImg, q.B, q.BImg, q.C, q.CImg, q.D, q.DImg, q.answer, q.level, q.wrong];
+    console.log("initiate bookmark");
+    console.log("topic = "+q.topic);
+    console.log("question = "+q.question);
+    var insertArr = [q.topic, q.question, q.questionImage, q.A, q.AImg, q.B, q.BImg, q.C, q.CImg, q.D, q.DImg, q.answer, q.level, q.wrong];
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var query = "SELECT question FROM questionBookmarks WHERE question = ?";
     $cordovaSQLite.execute(db, query, [q.question]).then(function(result){
       if(result.rows.length === 0){
         console.log("no similarities");
-        query = "INSERT INTO questionBookmarks (subject, chapter, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        query = "INSERT INTO questionBookmarks (topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $cordovaSQLite.execute(db, query, insertArr).then(function(res){
           console.log(res.insertId);
           d.resolve(true);
@@ -315,10 +373,12 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
     var d = $q.defer();
     var query = "UPDATE qaLevels SET level = ? WHERE topic = ?";
     $cordovaSQLite.execute(db, query, [level, topic]).then(function(result){
+      d.resolve();
       console.log("changed level to " + level);
     }, function(err){
       console.log(err.message);
     });
+    return d.promise;
   };
   return self;
 });
@@ -424,6 +484,7 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
     return d.promise;
   };
   self.removeVideo = function(id, subject){
+    var d = $q.defer();
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
       physics: "physicsVideos",
@@ -435,8 +496,10 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
       console.log("deleted video from db");
       d.resolve();
     }, function(err){
+      d.reject();
       console.log(err.message);
     });
+    return d.promise;
   };
   return self;
 });
@@ -444,10 +507,12 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
 app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
   var self = {};
   self.appendPointsForGame = function(points, subject, topic, correct, wrong){
-    var uuid = $cordovaDevice.getUUID();
+    //var uuid = $cordovaDevice.getUUID(();)
+    console.log("insert points = " + points);
+    console.log("no of wrong = " + wrong);
     var d = $q.defer();
-    var query = "UPDATE user SET pointsTotal = pointsTotal + ?, pointsCurrent = pointsCurrent + ? WHERE deviceId = ?";
-    $cordovaSQLite.execute(db, query, [points, points, uuid]).then(function(res){
+    var query = "UPDATE user SET pointsTotal = pointsTotal + ?, pointsCurrent = pointsCurrent + ?, correct = correct + " + correct + ", wrong = wrong + " + wrong;
+    $cordovaSQLite.execute(db, query, [points, points]).then(function(res){
       console.log("added points to table =  user");
     }, function(err){
       console.log(err.message);
@@ -466,21 +531,33 @@ app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
     });
     var rawDate = new Date();
     var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
-    query = "UPDATE timeWiseStats SET score = score + ? WHERE date = ?";
-    $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
+    query = "SELECT date, score FROM timeWiseStats WHERE date = ?";
+    $cordovaSQLite.execute(db, query, [dateToday]).then(function(res){
+      if(res.rows.length){
+        /**/
+        query = "UPDATE timeWiseStats SET score = score + ? WHERE date = ?";
+        $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
+          console.log("Updated timewisestats with " + points + dateToday);
+        }, function(err){
+          console.log(err.message);
+        });
+      }
+      else{
+        query = "INSERT INTO timeWiseStats (score, date) VALUES (?, ?)";
+        $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
+          console.log(res.insertId);
+          console.log("inserted into timeWiseStats " + points + dateToday);
+          d.resolve();
+        }, function(err){
+          console.log(err.message);
+        });
+      }
       console.log(res.insertId);
-      console.log("updated timeWiseStats " + dateToday);
+      //console.log("updated timeWiseStats " + dateToday);
       d.resolve();
     }, function(err){
       console.log(err.messsge);
-      query = "INSERT INTO timeWiseStats (score, date) VALUES (?, ?)";
-      $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
-        console.log(res.insertId);
-        console.log("inserted into timeWiseStats " + dateToday);
-        d.resolve();
-      }, function(err){
-        console.log(err.message);
-      });
+
     });
     return d.promise;
   };
@@ -497,26 +574,36 @@ app.factory('DbLeaderboard', function($q, $cordovaSQLite){
   var db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
   self.getScoreData = function(){
     var d = $q.defer();
-    var query = "SELECT * FROM timeWiseStats";
+    var query = "SELECT score, date FROM timeWiseStats";
+    self.today = 0;
+    self.week = 0;
+    self.month = 0;
+    console.log(query);
     $cordovaSQLite.execute(db, query).then(function(res){
       console.log(res.insertId);
-      var rawDate = new Date();
-      var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+      console.log(res.rows.length);
+      var dateToday = new Date();
+      //var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
       for(var x = 0; x < res.rows.length; x++){
-        var someDay = new Date(String(res.row.item(x).date));
+        console.log("len timewise > 0");
+        console.log("date = " + res.rows.item(x).date);
+        console.log("score = " + res.rows.item(x).score);
+        var thatDay = res.rows.item(x).date.split("/");
+        ++thatDay[0];
+        var someDay = new Date(String(thatDay));
         var timeDiff = Math.abs(dateToday.getTime() - someDay.getTime());
         var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-        if(diffDays < 1){
-          self.today += res.row.item(x).score;
-          self.week += res.row.item(x).score;
-          self.month += res.row.item(x).score;
+        if(diffDays <= 1){
+          self.today += res.rows.item(x).score;
+          self.week += res.rows.item(x).score;
+          self.month += res.rows.item(x).score;
         }
-        else if(diffDays < 7){
-          self.week += res.row.item(x).score;
-          self.month += res.row.item(x).score;
+        else if(diffDays <= 8){
+          self.week += res.rows.item(x).score;
+          self.month += res.rows.item(x).score;
         }
-        else if(diffDays < 30){
-          self.month += res.row.item(x).score;
+        else if(diffDays < 31){
+          self.month += res.rows.item(x).score;
         }
       }
       d.resolve();
@@ -524,6 +611,15 @@ app.factory('DbLeaderboard', function($q, $cordovaSQLite){
       console.log(err.message);
     });
     return d.promise;
+  };
+  self.saveRanks = function(ranks){
+    console.log("month rank to save = " + ranks.Month_Rank);
+    var query = "UPDATE user SET todayRank = " + ranks.Today_Rank + ", weekRank = " + ranks.Week_Rank + ", monthRank = " + ranks.Month_Rank;
+    $cordovaSQLite.execute(db, query).then(function(res){
+      console.log("updated user ranks");
+    }, function(err){
+      console.log(err.message);
+    });
   };
   return self;
 });
@@ -579,13 +675,37 @@ app.factory('DbTest', function($q, $cordovaSQLite){
     });
     return d.promise;
   };
-  self.editStats = function(code, score){
+  self.setUploaded = function(code){
+    var d = $q.defer();
+    var query = "UPDATE testsInfo SET uploaded = 1 WHERE password = '" + code + "'";
+    $cordovaSQLite.execute(db, query).then(function(res){
+      console.log("set as uploaded");
+      d.resolve();
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  self.getAllTestsInfo = function(){
+    var d = $q.defer();
+    var query = "SELECT name, score, physicsScore, chemistryScore, mathsScore, password, uploaded FROM testsInfo";
+    $cordovaSQLite.execute(db, query).then(function(res){
+      console.log("got some tests info");
+      d.resolve(res.rows);
+    }, function(err){
+      console.log(err.message);
+    });
+    return d.promise;
+  };
+  self.editStats = function(code, score, subjectScores){
+    var d = $q.defer();
     var query = "SELECT * FROM testsInfo WHERE password = ?";
     $cordovaSQLite.execute(db, query, [code]).then(function(res){
       if(!res.rows.item(0).taken){
-        query = "UPDATE testsInfo SET taken = 1, score = ? WHERE password = '" + code + "'";
-        $cordovaSQLite.execute(db, query, [score]).then(function(res){
+        query = "UPDATE testsInfo SET taken = 1, score = ?, physicsScore = ?, mathsScore = ?, chemistryScore = ? WHERE password = '" + code + "'";
+        $cordovaSQLite.execute(db, query, [score, subjectScores.physics, subjectScores.math, subjectScores.chemistry]).then(function(response){
           console.log("db: test is taken & scored");
+          d.resolve(res.rows.item(0).name);
         }, function(err){
           console.log(err.message);
         });
@@ -596,6 +716,7 @@ app.factory('DbTest', function($q, $cordovaSQLite){
     }, function(err){
       console.log(err.message);
     });
+    return d.promise;
   };
   self.storeTimeElapsed = function(code, time){
     query = "UPDATE testsInfo SET elapsedTime = ? WHERE password = '" + code + "'";

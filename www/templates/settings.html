@@ -1,10 +1,10 @@
 <ion-view view-title="Settings">
   <ion-content scroll="false">
-    <ion-list>
+    <div>
       <ion-radio ng-model="choice" ng-value="true">Vgpt Intranet<br></ion-radio>
       <ion-radio ng-model="choice" ng-value="false">Internet</ion-radio>
-      <ion-item><button class="button button-balanced" ng-click="saveSettings(choice)">Submit</button></ion-item>
-    </ion-list>
+    <button class="item item-balanced" ng-click="saveSettings(choice)">Submit</button>
+    </div>
 
   </ion-content>
   <div class="bar bar-footer">
@@ -12,12 +12,10 @@
       <label class="item-input-wrapper">
         <input type="text" placeholder="password" ng-model="password">
       </label>
-      <button class="button button-small" ng-click="enterPermanentSettings(password)">
+      <button class="item item-positive item-text-wrap" ng-click="enterPermanentSettings(password)">
         Submit
       </button>
-      <button class="button button-small" ng-click="delDB()">
-        delete db
-      </button>
+
     </div>
   </div>
 </ion-view>

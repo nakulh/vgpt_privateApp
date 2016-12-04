@@ -6,10 +6,16 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
   DbLeaderboard.getScoreData().then(function(res){
     DbServiceSettings.getUserInfo().then(function(user){
       console.log("got user data");
-      Ranks.getYourRank(user).then(function(ranks){
-        $scope.dayRank = ranks.dayRank;
-        $scope.weekRank = ranks.weekRank;
-        $scope.monthRank = ranks.monthRank;
+      console.log("send today score" + DbLeaderboard.today);
+      Ranks.getYourRank(user, DbLeaderboard.today, DbLeaderboard.week, DbLeaderboard.month).then(function(ranks){
+        console.log(ranks.Today_Rank);
+        console.log(ranks.Week_Rank);
+        console.log(ranks.Month_Rank);
+        DbLeaderboard.saveRanks(ranks);
+        /*$scope.userDayRank = ranks.dayRank;
+        $scope.userWeekRank = ranks.weekRank;
+        $scope.userMonthRank = ranks.monthRank;*/
+        console.log("updated all ranks");
       }, function(err){
         console.log(err);
       });
@@ -20,21 +26,21 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
   $scope.loadDay = function(){
     var low = $scope.dayRanks.length + 1;
     var high = low + 10;
-    Ranks.getPublicRanks(low, high, 1).then(function(ranks){
+    Ranks.getPublicRanks(low, high, "today").then(function(ranks){
         $scope.dayRanks = $scope.dayRanks.concat(ranks);
     });
   };
   $scope.loadWeek = function(){
     var low = $scope.weekRanks.length + 1;
     var high = low + 10;
-    Ranks.getPublicRanks(low, high, 7).then(function(ranks){
+    Ranks.getPublicRanks(low, high, "week").then(function(ranks){
         $scope.weekRanks = $scope.weekRanks.concat(ranks);
     });
   };
   $scope.loadMonth = function(){
     var low = $scope.monthRanks.length + 1;
     var high = low + 10;
-    Ranks.getPublicRanks(low, high, 30).then(function(ranks){
+    Ranks.getPublicRanks(low, high, "month").then(function(ranks){
         $scope.monthRanks = $scope.monthRanks.concat(ranks);
     });
   };

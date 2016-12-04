@@ -1,15 +1,41 @@
 var app = angular.module('leaderboard.service', []);
+var ip = "http://192.168.1.103:8080";
+var urlSelfRank = ip + "/Laravel/VGPT/public/api/v1/users";
 app.factory('Ranks', function($q, $http){
   var self = {};
-  self.getYourRank = function(info){
+  var toParams = function(obj) {
+      var p = [];
+      for (var key in obj) {
+          p.push(key + '=' + encodeURIComponent(obj[key]));
+      }
+      return p.join('&');
+  };
+  self.getYourRank = function(user, today, week, month){
     var d = $q.defer();
-    console.log("give user ranks");
-    var ranks = {
-      dayRank: 12,
-      weekRank: 56,
-      monthRank: 89
+    console.log("getting user ranks");
+    var userObj = {
+      adm_no: user[2],
+      today_score: today,
+      week_score: week,
+      month_score: month
     };
-    d.resolve(ranks);
+    $http({
+      url: urlSelfRank,
+      method: "POST",
+      data: toParams(userObj),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).success(function(rankRes){
+      d.resolve(rankRes);
+      var strBuilder = [];
+      for(var key in rankRes){
+            if (rankRes.hasOwnProperty(key)) {
+               strBuilder.push("Key is " + key + ", value is " + rankRes[key] + "\n");
+          }
+      }
+      console.log(strBuilder.join(""));
+    }, function(err){
+      console.log("error in self rank");
+    });
     //code for getting rank......
     return d.promise;
   };
@@ -17,23 +43,21 @@ app.factory('Ranks', function($q, $http){
     var d = $q.defer();
     console.log("give public ranks " + days);
     //code for public ranks......
-    d.resolve([
-      {
-        username: "Goku",
-        rank: 1,
-        score: "over 999999"
-      },
-      {
-        username: "Gohan",
-        rank: 2,
-        score: "over 999999"
-      },
-      {
-        username: "Goten",
-        rank: 2,
-        score: "over 999999"
-      },
-    ]);
+    var userObj = {
+      low: low,
+      high: high,
+      type: days
+    };
+    $http({
+      url: urlSelfRank + "/ranks",
+      method: "POST",
+      data: toParams(userObj),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    }).success(function(ranksPublic){
+      d.resolve(ranksPublic.names);
+    }, function(err){
+      console.log(err);
+    });
     return d.promise;
   };
   return self;

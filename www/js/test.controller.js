@@ -1,21 +1,24 @@
 var app = angular.module('test.controller', ['db.service', 'test.service']);
+var ip = "http://192.168.1.100:8080";
+var url = ip + "/Laravel/VGPT/public/api/v1/exams/entry";
 app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   $scope.submit = function(code){
     DbTest.checkCode(code).then(function(res){
-      if(!res.taken){
-        console.log("correct test code redirecting......");
-        var path = "/app/testlist/" + code;
-        $location.path(path);
+      if(!res){
+        $scope.message = "Incorrect Password";
       }
       else if(res.taken){
         $scope.message = "Test Already taken!";
       }
-      else if(!res){
-        $scope.message = "Incorrect Password";
+      else if(!res.taken){
+        console.log("correct test code redirecting......");
+        var path = "/app/testlist/" + code;
+        $location.path(path);
       }
     });
   };
   $scope.insertTest = function(){
+    console.log("controller");
     TestUpdate.insertTest();
   };
 });
@@ -52,6 +55,7 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
       questions[qIndex].push(q);
     }
     $scope.subjects = subjects;
+    $rootScope.subjects = subjects;
     $scope.questions = questions;
     TestData.storeData(questions, subjects);
   });
@@ -61,7 +65,8 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
     $rootScope.timeLeft = testInfo.time - testInfo.elapsedTime;
     elapser = $rootScope.timeLeft - 60000;
     $rootScope.timer = setInterval(function(){
-      $rootScope.timeLeft -= 10000;
+      $rootScope.timeLeft -= 1000;
+      $rootScope.testTimer = Math.floor(($rootScope.timeLeft / 60000)) + ":" + (($rootScope.timeLeft / 1000)%60);
       $scope.$apply();
       if($rootScope.timeLeft <= 0){
         $location.path("/app/endTest");
@@ -85,7 +90,7 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
   };
 });
 
-app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope, $cordovaToast){
+app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope, $cordovaToast, $cordovaFileOpener2){
 
   //Code for handling visibility of next & prev button
   if(TestData.subjects.indexOf($stateParams.subject) === 0 && $stateParams.question == 1){
@@ -106,7 +111,7 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   var subject = $stateParams.subject;
   var questionNum = $stateParams.question-1;
   $scope.saveQuestion = function(userAns){
-    console.log(userAns);
+    console.log("userAns =" + userAns);
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].userAns = userAns;
     TestData.questions[TestData.subjects.indexOf(subject)][questionNum].answered = true;
     TestData.storeData(TestData.questions, TestData.subjects);
@@ -171,6 +176,24 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
     }
   };
   //END Code for handling prev & next button
+  $scope.openImage = function(link){
+    console.log("link = "+link)
+    $cordovaFileOpener2.open(
+      link,
+      "image/" + link.split(".").pop()
+    ).then(function() {
+        console.log("file opened");
+    }, function(err) {
+        console.log(err);
+        var strBuilder = [];
+        for(var key in err){
+              if (err.hasOwnProperty(key)) {
+                 strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+            }
+        }
+        console.log(strBuilder.join(""));
+    });
+  };
 
   $scope.showConfirm = function() {
   var confirmPopup = $ionicPopup.confirm({
@@ -193,19 +216,27 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   };
 });
 
-app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest){
+app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest, $http, DbServiceSettings){
   clearInterval($rootScope.timer);
+  var subjectMarksObj = {
+    physics: 0,
+    chemistry: 0,
+    math: 0
+  };
   var questions = TestData.questions;
   var marks = 0;
   var subjectMarks = [];
   var x = 0, y = 0;
-
+  $scope.totalCorrect = 0;
+  var totalQ = 0;
   //Evaluate Test
   for(x = 0; x < questions.length; x++){
     subjectMarks.push(0);
     for(y = 0; y < questions[x].length; y++){
+      ++totalQ;
       if(questions[x][y].type == "single" && questions[x][y].userAns !== null){
         subjectMarks[x] += questions[x][y].answer == questions[x][y].userAns ? questions[x][y].marks : questions[x][y].negativeMarks;
+        $scope.totalCorrect += questions[x][y].answer == questions[x][y].userAns ? 1 : 0;
       }
       else if(questions[x][y].type == "multiple" && questions[x][y].userAns && questions[x][y].userAns !== null){
         var userAns = questions[x][y].answer.split(",");
@@ -213,25 +244,25 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest){
         var correct = true;
         if(questions[x][y].userAns.a){
           userAnsL++;
-          if(userAns.indexOf("a") < 0){
+          if(userAns.indexOf("A") < 0){
             correct = false;
           }
         }
         if(questions[x][y].userAns.b){
           userAnsL++;
-          if(userAns.indexOf("b") < 0){
+          if(userAns.indexOf("B") < 0){
             correct = false;
           }
         }
         if(questions[x][y].userAns.c){
           userAnsL++;
-          if(userAns.indexOf("c") < 0){
+          if(userAns.indexOf("C") < 0){
             correct = false;
           }
         }
         if(questions[x][y].userAns.d){
           userAnsL++;
-          if(userAns.indexOf("d") < 0){
+          if(userAns.indexOf("D") < 0){
             correct = false;
           }
         }
@@ -239,9 +270,11 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest){
           correct = false;
         }
         subjectMarks[x] += correct ? questions[x][y].marks : questions[x][y].negativeMarks;
+        $scope.totalCorrect += correct ? 1 : 0;
       }
       else if(questions[x][y].type == "integer" && questions[x][y].userAns !== null){
         subjectMarks[x] += questions[x][y].answer == questions[x][y].userAns ? questions[x][y].marks : questions[x][y].negativeMarks;
+        $scope.totalCorrect += questions[x][y].answer == questions[x][y].userAns  ? 1 : 0;
       }
     }
   }
@@ -263,7 +296,45 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest){
   $scope.marks = 0;
   for(x in subjectMarks){
     $scope.marks += subjectMarks[x];
+    subjectMarksObj[$rootScope.subjects[x]] = subjectMarks[x];
   }
-  DbTest.editStats(TestData.password, $scope.marks);
+  subjectMarksObj.physics = subjectMarksObj.physics ? subjectMarksObj.physics:0;
+  subjectMarksObj.chemistry = subjectMarksObj.chemistry ? subjectMarksObj.chemistry:0;
+  subjectMarksObj.math = subjectMarksObj.math ? subjectMarksObj.math:0;
+  $scope.accuracy = ($scope.totalCorrect / totalQ)*100;
+  console.log("physics Score="+subjectMarksObj.physics);
+  console.log("chemistry="+subjectMarksObj.chemistry);
+  console.log("maths="+subjectMarksObj.math);
+  DbTest.editStats(TestData.password, $scope.marks, subjectMarksObj).then(function(name){
+    //send data to server
+    DbServiceSettings.getUserInfo().then(function(user){
+      console.log("name of test = " + name);
+      var userObj = {
+        adm_no: "15JE000953",
+        test_name: name,
+        physics_score: subjectMarksObj.physics,
+        chemistry_score: subjectMarksObj.chemistry,
+        math_score: subjectMarksObj.math,
+        total: subjectMarksObj.math + subjectMarksObj.chemistry + subjectMarksObj.physics
+      };
+      var toParams = function(obj) {
+          var p = [];
+          for (var key in obj) {
+              p.push(key + '=' + encodeURIComponent(obj[key]));
+          }
+          return p.join('&');
+      };
+      console.log(url);
+      $http({
+        url: "http://192.168.1.100:8080/Laravel/VGPT/public/api/v1/exams/entry",
+        method: "POST",
+        data: toParams(userObj),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }).success(function(tests){
+          DbTest.setUploaded(TestData.password);
+          console.log("doneeeee");
+        });
+    });
+  });
   $scope.subjectMarks = subjectMarks;
 });

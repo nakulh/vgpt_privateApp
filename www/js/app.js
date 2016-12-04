@@ -6,7 +6,7 @@
 // 'starter.controllers' is found in controllers.js
 var db = null;
 
-angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller', 'test.controller', 'dpp.controller', 'user.controller'])
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.controller', 'qa.controller', 'videos.controller', 'leaderboard.controller', 'bookmark.controller', 'test.controller', 'dpp.controller', 'user.controller', 'ionic-material', 'ionMdInput'])
 
 .run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
@@ -14,7 +14,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     // for form inputs)
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-      cordova.plugins.Keyboard.disableScroll(true);
+      //cordova.plugins.Keyboard.disableScroll(true);
 
     }
     if (window.StatusBar) {
@@ -31,10 +31,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     };
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS timeWiseStats (score Int, date text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, batch text, accessMethod text, pointsTotal Int DEFAULT 0, pointsCurrent Int DEFAULT 0, level Int DEFAULT 0)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, batch text, accessMethod text, pointsTotal Int DEFAULT 0, pointsCurrent Int DEFAULT 0, level Int DEFAULT 0, correct Int DEFAULT 0, wrong Int DEFAULT 0, todayRank Int DEFAULT 0, weekRank Int DEFAULT 0, monthRank Int DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, id Int, deviceLink text, downloadDate text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, id Int, deviceLink text, downloadDate text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsVideos (chapter text, topic text, source text, intranetLink text, internetLink text, title text, description text, id Int, deviceLink text, downloadDate text)");
@@ -42,20 +42,24 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsMaterial (chapter text, topic text, intranetLink text, internetLink text, title text, description text, onDevice Bit, id Int, deviceLink text, fileType text)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaLevels (subject text, chapter text, topic text, level Tinyint DEFAULT 0)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS questionBookmarks (subject text, chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS questionBookmarks (subject text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaSubjectStats (subject text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS qaTopicStats (topic text, points Int DEFAULT 0, totalCorrect Int DEFAULT 0, totalWrong Int DEFAULT 0)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS testsInfo (taken Bit, date text, password text, name text, subjects text, time Int, elapsedTime Int, correct Int, wrong Int, score Int, uploaded Bit)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS testsInfo (taken Bit, date text, password text, name text, subjects text, time Int, elapsedTime Int, correct Int, wrong Int, score Int, physicsScore Int, mathsScore Int, chemistryScore Int, uploaded Bit)");
     $cordovaSQLite.execute(db, "SELECT * FROM timeWiseStats").then(function(res){
       if(res.rows.length > 0){
-        var rawDate = new Date();
-        var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
-        for(var x = 0; x < res.row.length; x++){
-          var someDay = new Date(String(res.row.item(x).date));
+        var dateToday = new Date();
+        //var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
+        for(var x = 0; x < res.rows.length; x++){
+          var thatDay = res.rows.item(x).date.split("/");
+          ++thatDay[0];
+          var someDay = new Date(String(thatDay));
           var timeDiff = Math.abs(dateToday.getTime() - someDay.getTime());
           var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            console.log("diffDays diff = " + diffDays);
           if(diffDays >= 30){
-            dbDel(res.row.item(x).date);
+            dbDel(res.rows.item(x).date);
+            console.log("del score from " + res.rows.item(x).date);
           }
         }
       }
@@ -128,13 +132,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
   })
 
   .state('app.qaGame', {
-    url: '/qa/game/:subject/:chapter',
+    url: '/qa/game/:subject/:topic',
     views: {
       'menuContent': {
         templateUrl: 'templates/qaGame.html',
         controller: 'QaGameCtrl'
       }
-    }
+    },
+    cache: false
   })
 
   .state('app.qaGameEnd', {
@@ -216,8 +221,43 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
       }
     }
   })
+  .state('app.leaderToday', {
+        url: '/leaderToday',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/leaderToday.html',
+                controller: 'LeaderboardCtrl'
+            },
+            'fabContent': {
 
-  .state('app.leaderboard', {
+            }
+        }
+    })
+    .state('app.leaderWeekly', {
+        url: '/leaderWeekly',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/leaderWeekly.html',
+                controller: 'LeaderboardCtrl'
+            },
+            'fabContent': {
+
+            }
+        }
+    })
+    .state('app.leaderMonthly', {
+        url: '/leaderMonthly',
+        views: {
+            'menuContent': {
+                templateUrl: 'templates/leaderMonthly.html',
+                controller: 'LeaderboardCtrl'
+            },
+            'fabContent': {
+
+            }
+        }
+    })
+  /*.state('app.leaderboard', {
     url: '/leaderboard',
     views: {
       'menuContent': {
@@ -225,7 +265,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
         controller: 'LeaderboardCtrl'
       }
     }
-  })
+  })*/
 
   .state('app.testList', {
     url: '/testlist',
@@ -310,8 +350,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
         templateUrl: 'templates/user.html',
         controller: 'UserCtrl'
       }
-    }
+    },
+    cache: false
   });
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/settings');
+  $urlRouterProvider.otherwise('/app/user');
 });
