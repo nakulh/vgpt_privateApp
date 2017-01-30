@@ -31,7 +31,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
     };
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS timeWiseStats (score Int, date text)");
-    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, batch text, accessMethod text, pointsTotal Int DEFAULT 0, pointsCurrent Int DEFAULT 0, level Int DEFAULT 0, correct Int DEFAULT 0, wrong Int DEFAULT 0, todayRank Int DEFAULT 0, weekRank Int DEFAULT 0, monthRank Int DEFAULT 0)");
+    $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS user (firstname text, lastname text, deviceId text, admnNo text, batch text, accessMethod text, pointsTotal Int DEFAULT 0, pointsCurrent Int DEFAULT 0, level Int DEFAULT 0, correct Int DEFAULT 0, wrong Int DEFAULT 0, todayRank Int DEFAULT 0, weekRank Int DEFAULT 0, monthRank Int DEFAULT 0)").then(function(res){
+      console.log("dreated user");
+    }, function(err){
+      console.log(err.message);
+    });
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS physicsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS chemistryQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
     $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS mathsQuestions (chapter text, topic text, question text, questionImage text, A text, AImg text, B text, BImg text, C text, CImg text, D text, DImg text, answer text, level Tinyint, wrong Tinyint DEFAULT 0, id Int, compulsory Tinyint DEFAULT 0)");
@@ -149,7 +153,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
         templateUrl: 'templates/qaEnd.html',
         controller: 'QaEndCtrl'
       }
-    }
+    },
+    cache: false
   })
 
   .state('app.videos', {

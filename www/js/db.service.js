@@ -66,7 +66,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
   var self = {};
   self.downloading = true;
   var downloadImage = function(url){
-    url = "http://192.168.1.103:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.10:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();

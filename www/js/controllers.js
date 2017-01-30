@@ -152,7 +152,33 @@ angular.module('starter.controllers', ['db.service'])
       console.log(err.message);
     });
     console.log("uuid = " + uuid);
-
+    var physicsTopics = ["physics_and_measurement", "kinematics", "laws_of_motion", "work_energy_and_power", "rotational_motion", "gravitation", "proprtie_of_solid_and_liquids", "thermodynamics" , "kinetic_theory_of_gases", "oscillation_and_waves", "magnetic_effect_of_current_and_magnetism", "electromagnetic_induction_and_alternating_currents", "electromagnetic_waves", "optics", "dual_nature_of_matter_and_radiation", "atoms_and_nuclei", "electrnic_devices", "communication_systems", "modern_physics", "electrostatics"];
+    var chemistryTopics = ["some_basic_concept_in_chemistry", "states_of_matter", "atomic_structure", "chemical_bonding_and_molecular_structure", "chemical_thermodynamics", "the_solid_state", "solutions", "electrochemistry", "chemical_kinetics", "surface_chemistry", "general_principles_and_process_of_isolation_of_elemnts", "the_p_block_elements", "the_d_and_f_block_elements", "coordination_compounds", "redox_reactions", "hydrogen", "the_s_block_elements", "the_p_block_elements", "organic_chemistry", "hydrocarbons", "environmental_chemistry"];
+    var mathsTopics = ["set_relations_and_functions", "complex_numbers", "equation_and_inequalities", "sequences_and_series", "permutation_and_combinations", "binomial_theorm_and_mathematical_induction", "matrices_and_determinants", "trignometric_identities_equations", "inverse_trignometric_functions", "properties_of_triangle", "heights_and_distances", "rectangular_cartesian_coordinates", "straight_line_and_pair_of_straight_lines", "circle_and_system_of_circles", "conic_section", "limits_continuity_and_differentiability", "differentiation", "application_of_derivatives", "indefinite_integrals", "definite_integrals", "differential_equations", "vector_algebra", "3d_gemotry", "statistics", "probability", "mathematical_logic_and_Boolean_algebra", "linear_programming", "statics_and_dynamics"];
+    for(var x = 0; x < physicsTopics.length; x++){
+      query = "INSERT INTO qaLevels (subject, chapter, topic, level) VALUES (?, ?, ?, ?)";
+      $cordovaSQLite.execute(db, query, ["physics", physicsTopics[x], physicsTopics[x], 0]).then(function(res){
+        console.log("level 0 " + physicsTopics[x]);
+      }, function(err){
+        console.log(err.message);
+      });
+    }
+    for(x = 0; x < chemistryTopics.length; x++){
+      query = "INSERT INTO qaLevels (subject, chapter, topic, level) VALUES (?, ?, ?, ?)";
+      $cordovaSQLite.execute(db, query, ["chemistry", chemistryTopics[x], chemistryTopics[x], 0]).then(function(res){
+        console.log("level 0 " + chemistryTopics[x]);
+      }, function(err){
+        console.log(err.message);
+      });
+    }
+    for(x = 0; x < mathsTopics.length; x++){
+      query = "INSERT INTO qaLevels (subject, chapter, topic, level) VALUES (?, ?, ?, ?)";
+      $cordovaSQLite.execute(db, query, ["maths", mathsTopics[x], mathsTopics[x], 0]).then(function(res){
+        console.log("level 0 " + mathsTopics[x]);
+      }, function(err){
+        console.log(err.message);
+      });
+    }
     //Code for sample data
     query = "INSERT INTO qaLevels (subject, chapter, topic, level) VALUES (?, ?, ?, ?)";
     $cordovaSQLite.execute(db, query, ["physics", "modern_physics", "modern_physics", 0]).then(function(result){

@@ -1,5 +1,5 @@
 var app = angular.module('test.controller', ['db.service', 'test.service']);
-var ip = "http://192.168.1.100:8080";
+var ip = "http://192.168.1.10:8080";
 var url = ip + "/Laravel/VGPT/public/api/v1/exams/entry";
 app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   $scope.submit = function(code){
@@ -326,7 +326,7 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest, $ht
       };
       console.log(url);
       $http({
-        url: "http://192.168.1.100:8080/Laravel/VGPT/public/api/v1/exams/entry",
+        url: "http://192.168.1.10:8080/Laravel/VGPT/public/api/v1/exams/entry",
         method: "POST",
         data: toParams(userObj),
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}

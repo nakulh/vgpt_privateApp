@@ -1,5 +1,5 @@
 var app = angular.module('test.service', ['db.service']);
-var ip = "http://192.168.1.103:8080";
+var ip = "http://192.168.1.10:8080";
 var url = ip + "/Laravel/VGPT/public/api/v1/test/batch";
 app.factory('TestUpdate', function($q, $http, $cordovaSQLite, DbServiceSettings, $cordovaFileTransfer){
   var userObj = {};
@@ -28,7 +28,7 @@ app.factory('TestUpdate', function($q, $http, $cordovaSQLite, DbServiceSettings,
       return p.join('&');
   };
   var downloadImage = function(url){
-    url = "http://192.168.1.103:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.10:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();

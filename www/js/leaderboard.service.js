@@ -1,5 +1,5 @@
 var app = angular.module('leaderboard.service', []);
-var ip = "http://192.168.1.103:8080";
+var ip = "http://192.168.1.10:8080";
 var urlSelfRank = ip + "/Laravel/VGPT/public/api/v1/users";
 app.factory('Ranks', function($q, $http){
   var self = {};
