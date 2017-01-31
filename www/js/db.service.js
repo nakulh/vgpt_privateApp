@@ -537,7 +537,7 @@ app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
         /**/
         query = "UPDATE timeWiseStats SET score = score + ? WHERE date = ?";
         $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
-          console.log("Updated timewisestats with " + points + dateToday);
+          console.log("Updated timewisestats with " + "points = " + points + " " + dateToday);
         }, function(err){
           console.log(err.message);
         });
@@ -546,7 +546,7 @@ app.factory('PointsEditor', function($q, $cordovaSQLite, $cordovaDevice){
         query = "INSERT INTO timeWiseStats (score, date) VALUES (?, ?)";
         $cordovaSQLite.execute(db, query, [points, dateToday]).then(function(res){
           console.log(res.insertId);
-          console.log("inserted into timeWiseStats " + points + dateToday);
+          console.log("inserted into timeWiseStats " + "points = " + points + " " + dateToday);
           d.resolve();
         }, function(err){
           console.log(err.message);

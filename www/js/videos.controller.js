@@ -1,5 +1,5 @@
 var app = angular.module('videos.controller', ['db.service']);
-var ip = "http://192.168.1.10:8080";
+var ip = "http://192.168.1.105:8080";
 var resUrl = ip + "/Laravel/VGPT/resources/";
 app.controller('VideosCtrl', function($scope){
 

@@ -23,7 +23,7 @@ app.controller('QaStatsCtrl', function($scope){
 
 });
 
-app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuestions, QaStorage, $state, $timeout, $cordovaToast, $cordovaFileOpener2, $rootScope){
+app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuestions, QaStorage, $state, $timeout, $cordovaToast, $cordovaFileOpener2){
   $scope.currPoints = 0;
   var totalCorrect = 0;
   var totalWrong = 0;
@@ -181,7 +181,37 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
       $scope.totalCards = cards.length;
       $scope.counter = 0;
       $scope.card = cards[$scope.counter];
-
+      //katex
+      var katStr = [];
+      var katCount = 0;
+      var limits = [];
+      String.prototype.replaceBetween = function(start, end, what) {
+        return this.substring(0, start) + what + this.substring(end);
+      };
+      for(var l = 0; l < $scope.card.question.length; l++){
+        if($scope.card.question.charAt(l) == "`"){
+          console.log("` detected`");
+          var lower = l;
+          var toConvert = "";
+          ++l;
+          while($scope.card.question.charAt(l) != "`"){
+            toConvert += $scope.card.question.charAt(l);
+            l++;
+          }
+          var upper = l;
+          limits.push([lower, upper]);
+          katStr.push(katex.renderToString(toConvert, {displayMode: true}));
+          katCount++;
+        }
+      }
+      if(katStr.length){
+        for(l = katStr.length-1; l >= 0; l--){
+          console.log("l= " + l);
+          $scope.card.question = $scope.card.question.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
+        }
+      }
+      document.getElementById("jax").innerHTML = $scope.card.question;
+      console.log($scope.card.question);
       $rootScope.timeout = $timeout(function(){
         $scope.next(false);
         console.log("timeout");
@@ -191,7 +221,6 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         $scope.card.timing -= 1;
         $scope.$apply();
       }, 1000);
-
       $scope.next = function(userAns){
         if(userAns == $scope.card.answer){
           $scope.card.correct = 1;
@@ -256,6 +285,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         $timeout.cancel($rootScope.timeout);
         clearInterval(timer);
         $scope.card = cards[++$scope.counter];
+        console.log($scope.card.question);
         if($scope.card.questionImage){
           window.plugins.Base64.encodeFile($scope.card.questionImage, function(base64){
             console.log('file base64 encoding: ' + base64);
@@ -290,6 +320,35 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         cards[$scope.counter-1].userAns = userAns;
         console.log(cards[$scope.counter-1].userAns);
         //$scope.userAns = false;
+        var katStr = [];
+        var katCount = 0;
+        var limits = [];
+        String.prototype.replaceBetween = function(start, end, what) {
+          return this.substring(0, start) + what + this.substring(end);
+        };
+        for(var l = 0; l < $scope.card.question.length; l++){
+          if($scope.card.question.charAt(l) == "`"){
+            console.log("` detected`");
+            var lower = l;
+            var toConvert = "";
+            ++l;
+            while($scope.card.question.charAt(l) != "`"){
+              toConvert += $scope.card.question.charAt(l);
+              l++;
+            }
+            var upper = l;
+            limits.push([lower, upper]);
+            katStr.push(katex.renderToString(toConvert, {displayMode: true}));
+            katCount++;
+          }
+        }
+        if(katStr.length){
+          for(l = katStr.length-1; l >= 0; l--){
+            console.log("l= " + l);
+            $scope.card.question = $scope.card.question.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
+          }
+        }
+        document.getElementById("jax").innerHTML = $scope.card.question;
         $rootScope.timeout = $timeout(function(){
           if($scope.counter < DbQuestions.questions.length - 1){
             $scope.next(false);

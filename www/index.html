@@ -11,13 +11,14 @@
     <link href="lib/ionic-material/dist/ionic.material.min.css" rel="stylesheet">
     <link href="fonts/poiret.css" rel="stylesheet">
     <link href="css/animate.css" rel="stylesheet">
+    <link rel="stylesheet" href="lib\katex\katex.min.css">
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <script src="lib/ngCordova/dist/ng-cordova.min.js"></script>
+    <script src="lib/ngCordova/dist/ng-cordova.js"></script>
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
@@ -40,8 +41,13 @@
     <script src="js/dpp.service.js"></script>
     <script src="js/user.controller.js"></script>
     <script src="lib/platform/platform.js"></script>
-    <link rel="import" href="lib/math-elements/math.html">
+    <!--<link rel="import" href="lib/math-elements/math.html">-->
     <script src="lib/ion-md-input/js/ion-md-input.min.js"></script>
+    <script src="lib\katex\katex.min.js"></script>
+    <!--<script type="text/javascript" async
+      src="lib\MathJax-2.6-latest\MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>-->
+    <!-- Relaod MathJax using MathJax.Hub.Queue(["Typeset",MathJax.Hub]);-->
     <!--<script src="lib/ocLazyLoad.min.js"></script>-->
   </head>
 
