@@ -1,27 +1,4 @@
-<!--<ion-view view-title="game">
-  <ion-content>
-    <div class="list card">
-      <div class="item item-body">
-        <p>
-          {{card.question}}
-        </p>
-      </div>
-    </div>
-    <ion-list>
-      <ion-radio ng-model="userAns" ng-value="'a'">{{card.a}}</ion-radio>
-      <ion-radio ng-model="userAns" ng-value="'b'">{{card.b}}</ion-radio>
-      <ion-radio ng-model="userAns" ng-value="'c'">{{card.c}}</ion-radio>
-      <ion-radio ng-model="userAns" ng-value="'d'">{{card.d}}</ion-radio>
-    </ion-list>
-    <button ng-if="counter < totalCards-1" ng-click="next(userAns)" class="button button-energized">Next</button>
-    <button ng-if="counter == totalCards-1" ng-click="end(userAns)" class="button button-energized">End</button>
-    <button ng-click="userAns = false" class="button button-energized">Unselect</button>
-    <button ng-click="bookmark()" class="button button-outline icon-right ion-bookmark button-assertive">Bookmark</button>
-    {{card.timing}}
-  </ion-content>
-</ion-view>-->
-<ion-view view-title="Question">
-
+<ion-modal-view>
     <ion-content class="grey" >
       <div class="row">
         <div class="col"></div>
@@ -41,21 +18,6 @@
         <div class="item card-item">
             <div  id="box_shadow" class="card stable-bg ink ink-dark">
                 <div class="item item-text-wrap">
-                  <div class=" bbar button-bar myfont" margin-bottom="20px">
-                    <a ng-click="prev()" id="box_shadow_b" class="button button-positive">
-                      <small>Previous</small>
-                    </a>
-                     <a ng-click="card.currAns = false" id="box_shadow_b" class="button button-positive">
-                       <small>Unselect</small>
-                     </a>
-                     <a ng-if="counter < totalCards-1" ng-click="next(card.currAns)" id="box_shadow_b" class="button button-positive">
-                       <i class="icon ion-arrow-right-b">
-                       </i>
-                     </a>
-                     <a ng-if="counter == totalCards-1" ng-click="end(card.currAns)" id="box_shadow_b" class="button button-positive">
-                       <small>End</small>
-                     </a>
-                  </div>
                     <!--<span><strong>1.</strong></span>-->
                     <strong id="jax">{{card.question}}</strong>
                     <a ng-hide="!currQImg" class="image" ng-click="card.open()"><img ng-src="{{currQImg}}">
@@ -79,8 +41,7 @@
         <div class="row">
           <div class="col"></div>
         <a class="item item-dark myfont col-40"   ng-click="end(card.currAns)" style="text-align:center;"><b>End Game</b></a>
-        <a class="item item-dark myfont col-40"   ng-click="bookmark()" style="text-align:center;"><b>Bookmark</b></a>
         <div class="col"></div>
       </div>
     </ion-content>
-</ion-view>
+</ion-modal-view>

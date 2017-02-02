@@ -11,7 +11,7 @@
          <div class="row" ng-repeat="bookmark in bookmarks">
            <item class="sub_topics_no lgrey">{{$index+1}}</item>
            <a class="item item-text-wrap item-balanced sub_topics_item" ng-click="showQuestion(bookmark)">
-             {{bookmark.question}}
+             {{bookmark.toShow}}
           </a>
         </div>
       </div>

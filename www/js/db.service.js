@@ -66,7 +66,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
   var self = {};
   self.downloading = true;
   var downloadImage = function(url){
-    url = "http://192.168.1.10:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.102:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();
@@ -160,7 +160,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
     var dbObj = {
       physics: "physicsVideos",
       chemistry: "chemistryVideos",
-      maths: "mathsVideos"
+      math: "mathsVideos"
     };
     var d = $q.defer();
     var query = "INSERT INTO " + dbObj[video.subject.toLowerCase()] + " (chapter, topic, intranetLink, internetLink, title, description, id) VALUES (?, ?, ?, ?, ? ,? ,?)";
@@ -334,7 +334,14 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
     console.log("initiate bookmark");
     console.log("topic = "+q.topic);
     console.log("question = "+q.question);
-    var insertArr = [q.topic, q.question, q.questionImage, q.A, q.AImg, q.B, q.BImg, q.C, q.CImg, q.D, q.DImg, q.answer, q.level, q.wrong];
+    var strBuilder = [];
+    for(var key in q){
+          if (q.hasOwnProperty(key)) {
+             strBuilder.push("Key is " + key + ", value is " + q[key] + "\n");
+        }
+    }
+    console.log(strBuilder.join(""));
+    var insertArr = [q.topic, q.question, q.questionImage, q.a, q.AImg, q.b, q.BImg, q.c, q.CImg, q.d, q.DImg, q.answer, q.level, q.wrong];
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var query = "SELECT question FROM questionBookmarks WHERE question = ?";
     $cordovaSQLite.execute(db, query, [q.question]).then(function(result){
@@ -437,7 +444,7 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
   };
 
   //get full info for video
-  self.getVideo = function(subject, video){
+  self.getVideo = function(video, subject){
     db = $cordovaSQLite.openDB({name: 'my.db', location: 'default'});
     var dbObj = {
       physics: "physicsVideos",
@@ -447,16 +454,15 @@ app.factory('DbVideos', function($q, $cordovaSQLite){
     console.log(subject);
     console.log(video);
     var d = $q.defer();
-    self.video = [];
     var query = "SELECT chapter, topic, intranetLink, internetLink, title, description, id, deviceLink, downloadDate FROM '" + dbObj[subject] + "' WHERE title = ?";
     $cordovaSQLite.execute(db, query, [video]).then(function(result){
       d.resolve();
       if(result.rows.length > 0){
-        console.log(result.rows);
-        self.videosList = result.rows;
+        console.log(result.rows.length);
+        self.link = result.rows.item(0).deviceLink;
       }
       else{
-        self.videosList = false;
+        self.link = false;
         console.log("no videos");
       }
     });

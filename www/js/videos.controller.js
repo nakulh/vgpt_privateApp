@@ -1,5 +1,5 @@
 var app = angular.module('videos.controller', ['db.service']);
-var ip = "http://192.168.1.105:8080";
+var ip = "http://192.168.1.101:8080";
 var resUrl = ip + "/Laravel/VGPT/resources/";
 app.controller('VideosCtrl', function($scope){
 
@@ -35,8 +35,37 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
       this.intranetLink = video.intranetLink;
       this.internetLink = video.internetLink;
       console.log(video.deviceLink);
+      this.deviceLink = video.deviceLink;
+      this.open = function(){
+        DbVideos.getVideo(this.title, $stateParams.subject).then(function(){
+          this.deviceLink = DbVideos.link;
+          var mime;
+          if(this.deviceLink){
+            mime = "video/" + this.deviceLink.split(".").pop();
+          }
+          else{
+            mime = "mp4";
+          }
+          $cordovaFileOpener2.open(
+            this.deviceLink,
+            mime
+          ).then(function() {
+              console.log("file opened");
+          }, function(err) {
+              $cordovaToast.showShortBottom('Download video first');
+              console.log(err);
+              var strBuilder = [];
+              for(var key in err){
+                  if (err.hasOwnProperty(key)) {
+                    strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+                  }
+              }
+              console.log(strBuilder.join(""));
+          });
+        });
+      };
       if(video.deviceLink){
-        this.open = function(){
+        /*this.open = function(){
           var mime = "video/" + video.deviceLink.split(".").pop();
           $cordovaFileOpener2.open(
             video.deviceLink,
@@ -53,18 +82,28 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
               }
               console.log(strBuilder.join(""));
           });
-        };
+        };*/
         this.delete = function(){
           $cordovaFile.removeFile(cordova.file.externalApplicationStorageDirectory, video.deviceLink.split("/").pop())
             .then(function (success) {
               console.log('removed video file');
+              $cordovaToast.showShortBottom('Deleted video');
               DbVideos.removeVideo(video.id, $stateParams.subject);
             }, function (error) {
               console.log('error removing video file');
             });
         };
+        this.download = function(){
+          $cordovaToast.showShortBottom('Already downloaded');
+        };
       }
       else{
+        /*this.open = function(){
+          $cordovaToast.showShortBottom('Download the video first');
+        };*/
+        this.delete = function(){
+          $cordovaToast.showShortBottom('Video already deleted or never downloaded');
+        };
         this.download = function(index){
           DbServiceSettings.getUserInfo().then(function(res){
             if(res[3] == "intranet"){
@@ -79,10 +118,10 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
                   //$scope.downloading = false;
                   console.log("download complete from " + resUrl + video.intranetLink);
                   DbVideos.updateDeviceLink($stateParams.subject, targetPath, video.id);
-                  this.open = function(){
-                    var mime = "video/" + video.deviceLink.split(".").pop();
+                  /*this.open = function(){
+                    var mime = "video/" + this.deviceLink.split(".").pop();
                     $cordovaFileOpener2.open(
-                      video.deviceLink,
+                      this.deviceLink,
                       mime
                     ).then(function() {
                         console.log("file opened");
@@ -96,10 +135,10 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
                         }
                         console.log(strBuilder.join(""));
                     });
-                  };
+                  };*/
                   video.deviceLink = targetPath;
                   this.delete = function(){
-                    $cordovaFile.removeFile(cordova.file.externalApplicationStorageDirectory, video.deviceLink.split("/").pop())
+                    $cordovaFile.removeFile(cordova.file.externalApplicationStorageDirectory, this.deviceLink.split("/").pop())
                       .then(function (success) {
                         console.log('removed video file');
                         DbVideos.removeVideo(DbVideos.videosList.item(x).id, $stateParams.subject);
@@ -128,6 +167,24 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
                 .then(function(result) {
                   console.log("download complete from " + url);
                   DbVideos.updateDeviceLink($stateParams.subject, targetPath, video.id);
+                  /*this.open = function(){
+                    var mime = "video/" + this.deviceLink.split(".").pop();
+                    $cordovaFileOpener2.open(
+                      this.deviceLink,
+                      mime
+                    ).then(function() {
+                        console.log("file opened");
+                    }, function(err) {
+                        console.log(err);
+                        var strBuilder = [];
+                        for(var key in err){
+                              if (err.hasOwnProperty(key)) {
+                                 strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+                            }
+                        }
+                        console.log(strBuilder.join(""));
+                    });
+                  };*/
                 }, function(err) {
                     console.log(err);
                 }, function (progress) {
@@ -142,7 +199,7 @@ app.controller('VideosSubDirCtrl', function($timeout, $state, $scope, $statePara
         };
       }
     };
-    var dateToday = new Date();
+    //var dateToday = new Date();
     //var dateToday = rawDate.getMonth() + "/" + rawDate.getDate() + "/" + rawDate.getFullYear();
     if(DbVideos.videosList.length >= 0){
       for(var x = 0; x < DbVideos.videosList.length; x++){

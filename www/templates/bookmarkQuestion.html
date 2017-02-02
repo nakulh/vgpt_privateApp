@@ -1,20 +1,3 @@
-<!--<ion-view view-title="Bookmarks">
-  <ion-content>
-    <div class="list card">
-      <div class="item item-body">
-        <p>
-          {{question.question}}
-        </p>
-      </div>
-    </div>
-    <ion-list>
-      <ion-radio>{{question.A}}</ion-radio>
-      <ion-radio>{{question.B}}</ion-radio>
-      <ion-radio>{{question.C}}</ion-radio>
-      <ion-radio>{{question.D}}</ion-radio>
-    </ion-list>
-  </ion-content>
-</ion-view>-->
 <ion-view view-title="Question">
     <ion-content class="grey" >
 
@@ -22,8 +5,8 @@
             <div  id="box_shadow" class="card stable-bg ink ink-dark">
                 <div class="item item-text-wrap">
                     <!--<span><strong>1.</strong></span>-->
-                    <strong>{{question.question}}</strong>
-                    <a class="image" ng-click="openImg(question.questionImage)" ng-if="question.questionImage">Open image
+                    <strong id="jax"></strong>
+                    <a class="image" ng-click="openImg(question.questionImage)" ng-if="question.questionImage"><img ng-src="{{currQImg}}">
                     </a>
 
                     <!--<div class="card-footer text-right">
@@ -35,10 +18,10 @@
                   </div>
                     <ion-list>
                        <div class="item-text-wrap">
-                          <ion-checkbox><b>1.</b>{{question.A}}</ion-checkbox>
-                          <ion-checkbox><b>2.</b>{{question.B}}</ion-checkbox>
-                          <ion-checkbox><b>3.</b>{{question.C}}</ion-checkbox>
-                          <ion-checkbox><b>4.</b>{{question.D}}</ion-checkbox>
+                          <ion-radio><b>1.</b>{{question.A}}<img ng-hide="!currAImg" ng-src="{{currAImg}}"></ion-radio>
+                          <ion-radio><b>2.</b>{{question.B}}<img ng-hide="!currBImg" ng-src="{{currBImg}}"></ion-radio>
+                          <ion-radio><b>3.</b>{{question.C}}<img ng-hide="!currCImg" ng-src="{{currCImg}}"></ion-radio>
+                          <ion-radio><b>4.</b>{{question.D}}<img ng-hide="!currDImg" ng-src="{{currDImg}}"></ion-radio>
                        </div>
                     </ion-list>
 

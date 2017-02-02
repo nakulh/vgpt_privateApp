@@ -184,7 +184,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
         templateUrl: 'templates/videosSubDir.html',
         controller: 'VideosSubDirCtrl'
       }
-    }
+    },
+    cache: false
   })
 
   .state('app.bookmarks', {
