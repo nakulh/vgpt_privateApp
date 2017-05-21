@@ -66,7 +66,7 @@ app.factory('DbItemAdd', function($q, $cordovaSQLite, $cordovaFileTransfer, $tim
   var self = {};
   self.downloading = true;
   var downloadImage = function(url){
-    url = "http://192.168.1.102:8080/Laravel/VGPT/resources/" + url;
+    url = "http://192.168.1.10:8080/Laravel/VGPT/resources/" + url;
     var trustHosts = true;
     var options = {};
     var filename = url.split("/").pop();
@@ -242,7 +242,7 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
       else{
         console.log("found no levels");
       }
-      query = "SELECT question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, wrong, id FROM physicsQuestions WHERE topic = '" + chapter + "' AND level = " + self.level;
+      query = "SELECT question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, wrong, id FROM " + dbObj[subject] + " WHERE topic = '" + chapter + "' AND level = " + self.level;
       console.log(query);
       $cordovaSQLite.execute(db, query).then(function(result){
         if(result.rows.length > 0){
@@ -346,7 +346,7 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
     var query = "SELECT question FROM questionBookmarks WHERE question = ?";
     $cordovaSQLite.execute(db, query, [q.question]).then(function(result){
       if(result.rows.length === 0){
-        console.log("no similarities");
+        console.log("no similarities in question image");
         query = "INSERT INTO questionBookmarks (topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $cordovaSQLite.execute(db, query, insertArr).then(function(res){
           console.log(res.insertId);
@@ -361,8 +361,34 @@ app.factory('DbQuestions', function($q, $cordovaSQLite){
           console.log(strBuilder.join(""));
         });
       }
+      else if(q.questionImage !== null){
+        console.log("similar question text");
+        query = "SELECT questionImage FROM questionBookmarks WHERE questionImage = ?";
+        $cordovaSQLite.execute(db, query, [q.questionImage]).then(function(result){
+          if(result.rows.length === 0){
+            console.log("no similarities in image");
+            query = "INSERT INTO questionBookmarks (topic, question, questionImage, A, AImg, B, BImg, C, CImg, D, DImg, answer, level, wrong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $cordovaSQLite.execute(db, query, insertArr).then(function(res){
+              console.log(res.insertId);
+              d.resolve(true);
+            }, function(err){
+              var strBuilder = [];
+              for(var key in err){
+                    if (err.hasOwnProperty(key)) {
+                       strBuilder.push("Key is " + key + ", value is " + err[key] + "\n");
+                  }
+              }
+              console.log(strBuilder.join(""));
+            });
+          }
+          else{
+            d.resolve(false);
+          }
+        }, function(err){
+          console.log(err.message);
+        });
+      }
       else{
-        console.log("already there");
         d.resolve(false);
       }
     }, function(err){

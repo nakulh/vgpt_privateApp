@@ -57,9 +57,9 @@
                    </i>
                  </a>
                 </div>
-                    <span><strong>1.</strong></span>
-                    <strong>{{question.question}}</strong>
-                    <a class="image" ng-if="question.qImgUrl" ng-click="openImage(question.qImgUrl)">open image
+                    <!--<span><strong>1.</strong></span>-->
+                    <strong id="jax"></strong>
+                    <a class="image" ng-if="currQImg" ng-click="openImage(question.qImgUrl)"><img ng-src="{{currQImg}}">
                     </a>
 
                     <div class="card-footer text-right">
@@ -70,18 +70,18 @@
                   </div>
                     <ion-list ng-if="question.type == 'multiple'">
                        <div class="item-text-wrap">
-                        <ion-checkbox ng-model="question.userAns.a"><b>1.</b>{{question.A}}</ion-checkbox>
-                        <ion-checkbox ng-model="question.userAns.b"><b>2.</b>{{question.B}}</ion-checkbox>
-                        <ion-checkbox ng-model="question.userAns.c"><b>3.</b>{{question.C}}</ion-checkbox>
-                        <ion-checkbox ng-model="question.userAns.d"><b>4.</b>{{question.D}}</ion-checkbox>
+                        <ion-checkbox ng-model="question.userAns.a"><b>1.</b>{{question.A}}<img ng-hide="!currAImg" ng-src="{{currAImg}}"></ion-checkbox>
+                        <ion-checkbox ng-model="question.userAns.b"><b>2.</b>{{question.B}}<img ng-hide="!currBImg" ng-src="{{currBImg}}"></ion-checkbox>
+                        <ion-checkbox ng-model="question.userAns.c"><b>3.</b>{{question.C}}<img ng-hide="!currCImg" ng-src="{{currCImg}}"></ion-checkbox>
+                        <ion-checkbox ng-model="question.userAns.d"><b>4.</b>{{question.D}}<img ng-hide="!currDImg" ng-src="{{currDImg}}"></ion-checkbox>
                        </div>
                     </ion-list>
                     <ion-list ng-if="question.type == 'single'">
                       <div class="item-text-wrap">
-                        <ion-radio ng-model="question.userAns" ng-value="'A'"><b>1.</b>{{question.A}}</ion-radio>
-                        <ion-radio ng-model="question.userAns" ng-value="'B'"><b>2.</b>{{question.B}}</ion-radio>
-                        <ion-radio ng-model="question.userAns" ng-value="'C'"><b>3.</b>{{question.C}}</ion-radio>
-                        <ion-radio ng-model="question.userAns" ng-value="'D'"><b>4.</b>{{question.D}}</ion-radio>
+                        <ion-radio ng-model="question.userAns" ng-value="'A'"><b>1.</b>{{question.A}}<img ng-hide="!currAImg" ng-src="{{currAImg}}"></ion-radio>
+                        <ion-radio ng-model="question.userAns" ng-value="'B'"><b>2.</b>{{question.B}}<img ng-hide="!currBImg" ng-src="{{currBImg}}"></ion-radio>
+                        <ion-radio ng-model="question.userAns" ng-value="'C'"><b>3.</b>{{question.C}}<img ng-hide="!currCImg" ng-src="{{currDImg}}"></ion-radio>
+                        <ion-radio ng-model="question.userAns" ng-value="'D'"><b>4.</b>{{question.D}}<img ng-hide="!currDImg" ng-src="{{currDImg}}"></ion-radio>
                       </div>
                     </ion-list>
                     <div class="list list-inset" ng-if="question.type == 'integer'">

@@ -1,5 +1,5 @@
 var app = angular.module('test.controller', ['db.service', 'test.service']);
-var ip = "http://192.168.1.102:8080";
+var ip = "http://192.168.1.10:8080";
 var url = ip + "/Laravel/VGPT/public/api/v1/exams/entry";
 app.controller('TestListCtrl', function($scope, DbTest, TestUpdate, $location){
   $scope.submit = function(code){
@@ -91,7 +91,88 @@ app.controller('TestOverviewCtrl', function($scope, $stateParams, DbTest, TestDa
 });
 
 app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $location, $ionicPopup, $rootScope, $cordovaToast, $cordovaFileOpener2){
-
+  var parseKatex = function(question){
+    var katStr = [];
+    var katCount = 0;
+    var limits = [];
+    String.prototype.replaceBetween = function(start, end, what) {
+      return this.substring(0, start) + what + this.substring(end);
+    };
+    for(var l = 0; l < question.length; l++){
+      if(question.charAt(l) == "`"){
+        console.log("` detected`");
+        var lower = l;
+        var toConvert = "";
+        ++l;
+        while(question.charAt(l) != "`"){
+          toConvert += question.charAt(l);
+          l++;
+        }
+        var upper = l;
+        limits.push([lower, upper]);
+        katStr.push(katex.renderToString(toConvert, {displayMode: true}));
+        katCount++;
+      }
+    }
+    if(katStr.length){
+      for(l = katStr.length-1; l >= 0; l--){
+        console.log("l= " + l);
+        question = question.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
+      }
+    }
+    document.getElementById("jax").innerHTML = question;
+  };
+  var showImages = function(question){
+    if(question.questionImage){
+      window.plugins.Base64.encodeFile(question.questionImage, function(base64){
+        console.log('img encoded for Question');
+        $scope.currQImg =  base64;
+      });
+    }
+    else{
+      $scope.currQImg = false;
+    }
+    if(question.AImg){
+      window.plugins.Base64.encodeFile(question.AImg, function(base64){
+        //console.log('file base64 encoding: ' + base64);
+        console.log('img encoded for A');
+        $scope.currAImg =  base64;
+      });
+    }
+    else{
+      $scope.currAImg = false;
+    }
+    if(question.BImg){
+      window.plugins.Base64.encodeFile(question.BImg, function(base64){
+        //console.log('file base64 encoding: ' + base64);
+        console.log('img encoded for B');
+        $scope.currBImg =  base64;
+      });
+    }
+    else{
+      $scope.currBImg = false;
+    }
+    if(question.CImg){
+      window.plugins.Base64.encodeFile(question.CImg, function(base64){
+        //console.log('file base64 encoding: ' + base64);
+        console.log('img encoded for C');
+        $scope.currCImg =  base64;
+      });
+    }
+    else{
+      $scope.currCImg = false;
+    }
+    if(question.DImg){
+      window.plugins.Base64.encodeFile(question.DImg, function(base64){
+        //console.log('file base64 encoding: ' + base64);
+        console.log('img encoded for D');
+        $scope.currDImg =  base64;
+      });
+    }
+    else{
+      $scope.currDImg = false;
+    }
+  };
   //Code for handling visibility of next & prev button
   if(TestData.subjects.indexOf($stateParams.subject) === 0 && $stateParams.question == 1){
     $scope.prevButton = false;
@@ -108,6 +189,8 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   //END Code for handling visibility of next & prev button
 
   $scope.question = TestData.questions[TestData.subjects.indexOf($stateParams.subject)][$stateParams.question-1];
+  showImages($scope.question);
+  parseKatex($scope.question.question);
   var subject = $stateParams.subject;
   var questionNum = $stateParams.question-1;
   $scope.saveQuestion = function(userAns){
@@ -133,15 +216,19 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   $scope.next = function(){
     $scope.prevButton = true;
     if($scope.question.num >= TestData.questions[TestData.subjects.indexOf(subject)].length){
-        var s = TestData.subjects.indexOf(subject);
-        s++;
-        subject = TestData.subjects[s];
-        $scope.question = TestData.questions[s][0];
-        console.log(TestData.questions[s][0].question);
-        questionNum = 0;
+      var s = TestData.subjects.indexOf(subject);
+      s++;
+      subject = TestData.subjects[s];
+      $scope.question = TestData.questions[s][0];
+      showImages($scope.question);
+      parseKatex($scope.question.question);
+      console.log(TestData.questions[s][0].question);
+      questionNum = 0;
     }
     else{
       $scope.question = TestData.questions[TestData.subjects.indexOf(subject)][questionNum+1];
+      showImages($scope.question);
+      parseKatex($scope.question.question);
       questionNum++;
       console.log(TestData.questions[TestData.subjects.indexOf(subject)][questionNum].question);
     }
@@ -155,16 +242,20 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   $scope.previous = function(){
     $scope.nextButton = true;
     if($scope.question.num <= 1){
-        var s = TestData.subjects.indexOf(subject);
-        s--;
-        subject = TestData.subjects[s];
-        var q = TestData.questions[s].length - 1;
-        $scope.question = TestData.questions[s][q];
-        console.log(TestData.questions[s][q].question);
-        questionNum = q;
+      var s = TestData.subjects.indexOf(subject);
+      s--;
+      subject = TestData.subjects[s];
+      var q = TestData.questions[s].length - 1;
+      $scope.question = TestData.questions[s][q];
+      showImages($scope.question);
+      parseKatex($scope.question.question);
+      console.log(TestData.questions[s][q].question);
+      questionNum = q;
     }
     else{
       $scope.question = TestData.questions[TestData.subjects.indexOf(subject)][questionNum-1];
+      showImages($scope.question);
+      parseKatex($scope.question.question);
       questionNum--;
       console.log(TestData.questions[TestData.subjects.indexOf(subject)][questionNum].question);
     }
@@ -177,7 +268,7 @@ app.controller('TestQuestionCtrl', function($scope, $stateParams, TestData, $loc
   };
   //END Code for handling prev & next button
   $scope.openImage = function(link){
-    console.log("link = "+link)
+    console.log("link = "+link);
     $cordovaFileOpener2.open(
       link,
       "image/" + link.split(".").pop()
@@ -310,7 +401,7 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest, $ht
     DbServiceSettings.getUserInfo().then(function(user){
       console.log("name of test = " + name);
       var userObj = {
-        adm_no: "15JE000953",
+        adm_no: user[2],
         test_name: name,
         physics_score: subjectMarksObj.physics,
         chemistry_score: subjectMarksObj.chemistry,
@@ -326,7 +417,7 @@ app.controller('TestEndCtrl', function($scope, TestData, $rootScope, DbTest, $ht
       };
       console.log(url);
       $http({
-        url: "http://192.168.1.102:8080/Laravel/VGPT/public/api/v1/exams/entry",
+        url: "http://192.168.1.10:8080/Laravel/VGPT/public/api/v1/exams/entry",
         method: "POST",
         data: toParams(userObj),
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}

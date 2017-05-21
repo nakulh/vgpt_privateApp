@@ -3,7 +3,7 @@
     <ion-content  class="sub_topics grey">
 
        <div class=" no-padding myfont" >
-        <div class="row " ng-repeat="weekRank in weekRanks">
+        <div class="row " ng-repeat="weekRank in weekRanks track by $index">
            <item class="leaderBoardRanks lgrey" id="box_shadow">{{$index+1}}</item>
           <a class="item item-positive leaderBoardName" id="box_shadow">
           <b>{{weekRank}}</b>

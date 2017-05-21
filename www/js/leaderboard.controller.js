@@ -15,7 +15,31 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
         /*$scope.userDayRank = ranks.dayRank;
         $scope.userWeekRank = ranks.weekRank;
         $scope.userMonthRank = ranks.monthRank;*/
-        console.log("updated all ranks");
+        console.log("updated self ranks");
+        $scope.loadDay = function(){
+          var low = $scope.dayRanks.length + 1;
+          var high = low + 10;
+          Ranks.getPublicRanks(low, high, "today").then(function(ranks){
+            $scope.dayRanks = $scope.dayRanks.concat(ranks);
+          });
+        };
+        $scope.loadWeek = function(){
+          var low = $scope.weekRanks.length + 1;
+          var high = low + 10;
+          Ranks.getPublicRanks(low, high, "week").then(function(ranks){
+              $scope.weekRanks = $scope.weekRanks.concat(ranks);
+          });
+        };
+        $scope.loadMonth = function(){
+          var low = $scope.monthRanks.length + 1;
+          var high = low + 10;
+          Ranks.getPublicRanks(low, high, "month").then(function(ranks){
+              $scope.monthRanks = $scope.monthRanks.concat(ranks);
+          });
+        };
+        $scope.loadDay();
+        $scope.loadWeek();
+        $scope.loadMonth();
       }, function(err){
         console.log(err);
       });
@@ -23,28 +47,4 @@ app.controller('LeaderboardCtrl', function($scope, DbLeaderboard, DbServiceSetti
       console.log(err);
     });
   });
-  $scope.loadDay = function(){
-    var low = $scope.dayRanks.length + 1;
-    var high = low + 10;
-    Ranks.getPublicRanks(low, high, "today").then(function(ranks){
-        $scope.dayRanks = $scope.dayRanks.concat(ranks);
-    });
-  };
-  $scope.loadWeek = function(){
-    var low = $scope.weekRanks.length + 1;
-    var high = low + 10;
-    Ranks.getPublicRanks(low, high, "week").then(function(ranks){
-        $scope.weekRanks = $scope.weekRanks.concat(ranks);
-    });
-  };
-  $scope.loadMonth = function(){
-    var low = $scope.monthRanks.length + 1;
-    var high = low + 10;
-    Ranks.getPublicRanks(low, high, "month").then(function(ranks){
-        $scope.monthRanks = $scope.monthRanks.concat(ranks);
-    });
-  };
-  $scope.loadDay();
-  $scope.loadWeek();
-  $scope.loadMonth();
 });

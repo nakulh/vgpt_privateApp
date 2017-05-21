@@ -1,6 +1,6 @@
 var app = angular.module('update.controller', ['update.service', 'db.service']);
-var ip = "http://192.168.1.102:8080";
-var resUrl = "http://192.168.1.102:8080" + "/Laravel/VGPT/resources/";
+var ip = "http://192.168.1.10:8080";
+var resUrl = "http://192.168.1.10:8080" + "/Laravel/VGPT/resources/";
 app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, DbItemAdd, $cordovaDevice, $timeout, $cordovaSQLite, $http, $cordovaFileTransfer, DbTest){
   $scope.loading = false;
   $scope.checkQuestionUpdates = function(){
@@ -35,7 +35,7 @@ app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, 
       }
       var url = "";
       if(result.rows.item(0).accessMethod == "intranet"){
-        url = "http://192.168.1.102:8080" + "/Laravel/VGPT/public/api/v1/question/" + count; /// add count
+        url = "http://192.168.1.10:8080" + "/Laravel/VGPT/public/api/v1/question/" + count; /// add count
       }
       else{
         url = "someURL" + "/Laravel/VGPT/public/api/v1/question/";
@@ -106,9 +106,10 @@ app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, 
         }
       }
       var url = "";
+      console.log("videos already present = " + count);
       console.log("count = " + count);
       if(result.rows.item(0).accessMethod == "intranet"){
-        url = "http://192.168.1.102:8080" + "/Laravel/VGPT/public/api/v1/video/" + count;
+        url = "http://192.168.1.10:8080" + "/Laravel/VGPT/public/api/v1/video/" + count;
       }
       else{
         url = "someURL" + "/Laravel/VGPT/public/api/v1/video/view";
@@ -154,19 +155,21 @@ app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, 
       console.log(err.message);
     });
     var batch = "";
+    console.log("count = " + count);
     $cordovaSQLite.execute(db, query).then(function(result){
       console.log(result.rows.item(0).batch);
       batch = result.rows.item(0).batch;
       var urld = "";
       if(result.rows.item(0).accessMethod == "intranet"){
-        urld = "http://192.168.1.102:8080" + "/Laravel/VGPT/public/api/v1/dpp/batch";
+        urld = "http://192.168.1.10:8080" + "/Laravel/VGPT/public/api/v1/dpp/batch";
       }
       else{
         urld = "someURL" + "/Laravel/VGPT/public/api/v1/dpp/batch/";
       }
+      console.log("no. of dpp already present" + count);
       var userObj = {
-        batch: batch,
-        no: count
+        batch: "123",//to change
+        no: count//to change
       };
       console.log(result.rows.item(0).batch);
       console.log(urld);
@@ -217,15 +220,19 @@ app.controller('UpdateCtrl', function($scope, UpdateService, DbServiceSettings, 
         }
         console.log(strBuilder.join(""));
         res = res.dpps;
+        if(!res.length){
+          console.log("no new dpps");
+        }
         for(var x = 0; x < res.length; x++){
           var filename = res[x].URL.split("/").pop();
           var ext = filename.split(".").pop();
           console.log(filename);
-          var url = "http://192.168.1.102:8080/" + "/Laravel/VGPT/resources/" + res[x].URL;
+          var url = "http://192.168.1.10:8080/" + "/Laravel/VGPT/resources/" + res[x].URL;
           var targetPath = cordova.file.externalApplicationStorageDirectory + filename;
           console.log(targetPath);
           downloadDpp(filename, ext, url, targetPath, res[x]);
         }
+        $scope.loading = false;
       }, function(err){
         console.log(err);
       });

@@ -11,8 +11,25 @@
 }
 .myfont{
   font-family: 'Poiret One', regular;
+  font-size: 1.5em;
 }
-ri
+.myfontA{
+  font-family: 'Poiret One', regular;
+  font-size: 2.5em;
+  font-weight: 200;
+}
+.testEndFont{
+  font-size: 2.5em;
+  text-align: center;
+}
+.ques_text{
+  font-size: 1.5em;
+  line-height: 1.3em;
+}
+.ans_text{
+  font-size: 1.3em;
+  line-height: 1.3em;
+}
 .showMoreBtn{
   margin-top:1em;
   text-align:center;
@@ -75,21 +92,23 @@ color: white;
   color:white;
   margin: 0.5em 0 0 0 ;
   padding: 0.3em 0.5em 0.3em 0.5em;
+  font-size: 1.5em;
 }
 .sub_topics_no_2{
   color:white;
   width: 2em;
   margin: 0.2em 0 0 0;
   padding: 0.3em 0.5em 0.3em 0.5em;
-  font-size: 110%;
+
 }
 .sub_topics{
-  padding: 0.5em 2em 0 2em;
+  padding: 0.5em 0.2em 0 2em;
+  font-size: 1.5em;
 }
 .sub_topics_item{
  margin: 0.5em 0 0 0 ;
- padding: 0.3em 0.5em 0.3em 0.5em;
-
+ padding: 0.3em 0.2em 0.3em 0.5em;
+ font-size: 1.5em;
 }
 
 .sub_topics_item_3{
@@ -106,6 +125,8 @@ color: white;
   padding: 1em 1em 1em 1em;
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
   background-color:  white;
+  height: auto;
+  width: auto;
 }
 .subject-image:hover{
   box-shadow: 0 0 0 0;
@@ -339,23 +360,29 @@ padding-bottom: 12px;
 }
 
 .se1{
+  padding-top: 0.5em;
   color:white;
-  font-size: 15px;
+  font-size: 3em;
   line-height: 2px;
+  font-weight: bold;
 }
 .se2{
-  color: white;
-  font-size: 30px;
+  padding-top: 0.25em;
+    color:white;
+  font-size: 4.5em;
   line-height: 2px;
+  font-weight: bold;
 }
 .se13{
   color:black;
-  font-size: 20px;
+  font-size: 4.5em;
   line-height: 3px;
+  font-weight: bold;
+    padding-top: 0.35em;
 }
 .se23{
   color:black;
-  font-size: 30px;
+  font-size:  5em;
   line-height: 2px;
 }
 .header-icons{
@@ -368,8 +395,8 @@ padding-bottom: 12px;
   color:white;
   background-color:#193132;
   text-align: center;
-  font-size: 130%;
-  font-family: 'Poiret One', regular;
+  font-size: 170%;
+  font-family: 'Poiret One', bold;
   padding: 5px 5px 5px 5px;
 }
 .stat_element{
@@ -382,8 +409,8 @@ padding-bottom: 12px;
   font-family: 'Poiret One', regular;
   font-stretch: extra-expanded;
   text-shadow: 4px;
-  width:75px;
-  height: 75px;
+  width:105px;
+  height: 105px;
   border: 0px;
   border-radius: 75px;
   display:inline-block;
@@ -394,6 +421,15 @@ padding-bottom: 12px;
   width:auto;
   text-align: center;
 }
+.stats_container_space{
+  height:2.5em;
+  width:auto;
+  text-align: center;
+}
+
+
+
+
 .col{
   text-align:center;
   display: flex;

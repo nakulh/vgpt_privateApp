@@ -124,6 +124,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
       }
     }
   })
+  .state('app.about', {
+    url: '/about',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/about.html',
+
+      }
+    }
+  })
 
   .state('app.qaDir', {
     url: '/qa/:subject',
@@ -225,7 +234,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
         templateUrl: 'templates/bookmarkQuestion.html',
         controller: 'BookmarkQuestionCtrl'
       }
-    }
+    },
+    cache: false
   })
   .state('app.leaderToday', {
         url: '/leaderToday',
@@ -237,7 +247,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
             'fabContent': {
 
             }
-        }
+        },
+        cache: false
     })
     .state('app.leaderWeekly', {
         url: '/leaderWeekly',
@@ -249,7 +260,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
             'fabContent': {
 
             }
-        }
+        },
+        cache: false
     })
     .state('app.leaderMonthly', {
         url: '/leaderMonthly',
@@ -261,7 +273,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova', 'update.
             'fabContent': {
 
             }
-        }
+        },
+        cache: false
     })
   /*.state('app.leaderboard', {
     url: '/leaderboard',

@@ -17,6 +17,7 @@ app.controller('QaDirectoryCtrl', function($scope, $stateParams){
     $scope.topics = ["set_relations_and_functions", "complex_numbers", "equation_and_inequalities", "sequences_and_series", "permutation_and_combinations", "binomial_theorm_and_mathematical_induction", "matrices_and_determinants", "trignometric_identities_equations", "inverse_trignometric_functions", "properties_of_triangle", "heights_and_distances", "rectangular_cartesian_coordinates", "straight_line_and_pair_of_straight_lines", "circle_and_system_of_circles", "conic_section", "limits_continuity_and_differentiability", "differentiation", "application_of_derivatives", "indefinite_integrals", "definite_integrals", "differential_equations", "vector_algebra", "3d_gemotry", "statistics", "probability", "mathematical_logic_and_Boolean_algebra", "linear_programming", "statics_and_dynamics"];
   }
   $scope.subject = $stateParams.subject;
+  console.log($scope.subject);
 });
 
 app.controller('QaStatsCtrl', function($scope){
@@ -82,7 +83,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
     return array;
   };
   //end array shuffle
-
+  console.log("subject = " + $stateParams.subject);
   $rootScope.topic = $stateParams.topic;
   DbQuestions.getQuestions($stateParams.subject, $stateParams.topic).then(function(){ //Get questions from db
     $scope.currLevel = DbQuestions.level+1;
@@ -165,12 +166,14 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         randArr.splice(r, 1);
         inPlay += 1;
       }*/
+      var prevTime;
       switch(DbQuestions.level){
         case 0:
           for(x = 0; x < cards.length; x++){
             cards[x].timing = 5*60*1000;
             cards[x].ppoints = cards[x].wrong > 0 ? 5 : 10;
             cards[x].npoints = -2;
+            prevTime = 5*60*1000;
             //console.log("set lvl 0");
           }
           console.log("set lvl 0");
@@ -180,6 +183,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             cards[x].timing = 10*60*1000;
             cards[x].ppoints = cards[x].wrong > 0 ? 10 : 25;
             cards[x].npoints = -5;
+            prevTime = 10*60*1000;
           }
           //console.log("set lvl 1");
           break;
@@ -188,6 +192,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             cards[x].timing = 15*60*1000;
             cards[x].ppoints = cards[x].wrong > 0 ? 50 : 100;
             cards[x].npoints = -25;
+            prevTime = 15*60*1000;
           }
           console.log("set lvl 2");
           break;
@@ -196,6 +201,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             cards[x].timing = 20*60*1000;
             cards[x].ppoints = cards[x].wrong > 0 ? 300 : 500;
             cards[x].npoints = -200;
+            prevTime = 20*60*1000;
           }
           console.log("set lvl 3");
           break;
@@ -204,6 +210,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             cards[x].timing = 25*60*1000;
             cards[x].ppoints = cards[x].wrong > 0 ? 500 : 1000;
             cards[x].npoints = -100;
+            prevTime = 25*60*1000;
           }
           break;
         default:
@@ -213,6 +220,41 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
       $scope.totalCards = cards.length;
       $scope.counter = 0;
       $scope.card = cards[$scope.counter];
+      if($scope.card.questionImage){
+        console.log("question has img = " + $scope.card.questionImage);
+        window.plugins.Base64.encodeFile($scope.card.questionImage, function(base64){
+          console.log('file base64 encoding done');
+          $scope.currQImg =  base64;
+        });
+      }
+      if($scope.card.AImg){
+        console.log("A has img = " + $scope.card.AImg);
+        window.plugins.Base64.encodeFile($scope.card.AImg, function(base64){
+          //console.log('file base64 encoding: ' + base64);
+          $scope.currAImg =  base64;
+        });
+      }
+      if($scope.card.BImg){
+        console.log("B has img = " + $scope.card.BImg);
+        window.plugins.Base64.encodeFile($scope.card.BImg, function(base64){
+          //console.log('file base64 encoding: ' + base64);
+          $scope.currBImg =  base64;
+        });
+      }
+      if($scope.card.CImg){
+        console.log("C has img = " + $scope.card.CImg);
+        window.plugins.Base64.encodeFile($scope.card.CImg, function(base64){
+          //console.log('file base64 encoding: ' + base64);
+          $scope.currCImg =  base64;
+        });
+      }
+      if($scope.card.DImg){
+        console.log("D has img = " + $scope.card.DImg);
+        window.plugins.Base64.encodeFile($scope.card.DImg, function(base64){
+          //console.log('file base64 encoding: ' + base64);
+          $scope.currDImg =  base64;
+        });
+      }
       //katex
       var katStr = [];
       var katCount = 0;
@@ -319,30 +361,35 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         $scope.card = cards[++$scope.counter];
         console.log($scope.card.question);
         if($scope.card.questionImage){
+          console.log("question has img = " + $scope.card.questionImage);
           window.plugins.Base64.encodeFile($scope.card.questionImage, function(base64){
             console.log('file base64 encoding done');
             $scope.currQImg =  base64;
           });
         }
         if($scope.card.AImg){
+          console.log("A has img = " + $scope.card.AImg);
           window.plugins.Base64.encodeFile($scope.card.AImg, function(base64){
             //console.log('file base64 encoding: ' + base64);
             $scope.currAImg =  base64;
           });
         }
         if($scope.card.BImg){
+          console.log("B has img = " + $scope.card.BImg);
           window.plugins.Base64.encodeFile($scope.card.BImg, function(base64){
             //console.log('file base64 encoding: ' + base64);
             $scope.currBImg =  base64;
           });
         }
         if($scope.card.CImg){
+          console.log("C has img = " + $scope.card.CImg);
           window.plugins.Base64.encodeFile($scope.card.CImg, function(base64){
             //console.log('file base64 encoding: ' + base64);
             $scope.currCImg =  base64;
           });
         }
         if($scope.card.DImg){
+          console.log("D has img = " + $scope.card.DImg);
           window.plugins.Base64.encodeFile($scope.card.DImg, function(base64){
             //console.log('file base64 encoding: ' + base64);
             $scope.currDImg =  base64;
@@ -381,6 +428,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
           }
         }
         document.getElementById("jax").innerHTML = $scope.card.question;
+        $scope.card.timing = prevTime;
         $rootScope.timeout = $timeout(function(){
           if($scope.counter < DbQuestions.questions.length - 1){
             $scope.next(false);
@@ -389,7 +437,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             $scope.end(false);
           }
           console.log("timeout");
-        }, $scope.card.timing);
+        }, prevTime);
         $scope.card.timing /= 1000;
         timer = setInterval(function(){
           $scope.card.timing -= 1;
@@ -397,12 +445,15 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         }, 1000);
       };
       $scope.prev = function(){
-        $ionicModal.fromTemplateUrl('templates/prevQuestion.html', {
+        /*$ionicModal.fromTemplateUrl('templates/prevQuestion.html', {
           scope: $scope,
           animation: 'slide-in-up'
         }).then(function(modal) {
           $scope.modal = modal;
         });
+        $scope.openModal = function() {
+          $scope.modal.show();
+        };
         //fx for closing model
         $scope.closeModal = function() {
           $scope.modal.hide();
@@ -411,7 +462,10 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         $scope.$on('$destroy', function() {
           $scope.modal.remove();
         });
-        $scope.prevModal = {};
+        $scope.$on('modal.hidden', function() {
+          // Execute action
+        });
+        $scope.prevModal = {};*/
         if($scope.counter > 0){
           /*$scope.currQImg = false;
           $scope.currAImg = false;
@@ -420,7 +474,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
           $scope.currDImg = false;*/
           $timeout.cancel($rootScope.timeout);
           clearInterval(timer);
-          var prevCard = cards[$scope.counter-1];
+          var prevCard = cards[--$scope.counter];
           if(prevCard.correct){
             prevCard.npoints = -(prevCard.ppoints + prevCard.npoints);
             prevCard.ppoints = 0;
@@ -429,37 +483,43 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             prevCard.ppoints = Math.floor(prevCard.ppoints / 2);
             prevCard.npoints = Math.floor(prevCard.npoints / 2);
           }
-          $scope.prevModal.card = prevCard;
-          if($scope.prevModal.card.questionImage){
+          $scope.card = prevCard;
+          $scope.currAImg = false;
+          $scope.currBImg = false;
+          $scope.currCImg = false;
+          $scope.currDImg = false;
+          $scope.currQImg = false;
+          if($scope.card.questionImage){
             window.plugins.Base64.encodeFile($scope.card.questionImage, function(base64){
-              console.log('file base64 encoding: ' + base64);
-              $scope.prevModal.currQImg =  base64;
+              //console.log('file base64 encoding: ' + base64);
+              $scope.currQImg =  base64;
             });
           }
-          if($scope.prevModal.card.AImg){
-            window.plugins.Base64.encodeFile($scope.prevModal.card.AImg, function(base64){
-              console.log('file base64 encoding: ' + base64);
-              $scope.prevModal.currAImg =  base64;
+          if($scope.card.AImg){
+            window.plugins.Base64.encodeFile($scope.card.AImg, function(base64){
+              //console.log('file base64 encoding: ' + base64);
+              $scope.currAImg =  base64;
             });
           }
-          if($scope.prevModal.card.BImg){
-            window.plugins.Base64.encodeFile($scope.prevModal.card.BImg, function(base64){
-              console.log('file base64 encoding: ' + base64);
-              $scope.prevModal.currBImg =  base64;
+          if($scope.card.BImg){
+            window.plugins.Base64.encodeFile($scope.card.BImg, function(base64){
+              //console.log('file base64 encoding: ' + base64);
+              $scope.currBImg =  base64;
             });
           }
-          if($scope.prevModal.card.CImg){
-            window.plugins.Base64.encodeFile($scope.prevModal.card.CImg, function(base64){
-              console.log('file base64 encoding: ' + base64);
-              $scope.prevModal.currCImg =  base64;
+          if($scope.card.CImg){
+            window.plugins.Base64.encodeFile($scope.card.CImg, function(base64){
+              //console.log('file base64 encoding: ' + base64);
+              $scope.currCImg =  base64;
             });
           }
-          if($scope.prevModal.card.DImg){
-            window.plugins.Base64.encodeFile($scope.prevModal.card.DImg, function(base64){
-              console.log('file base64 encoding: ' + base64);
-              $scope.prevModal.currDImg =  base64;
+          if($scope.card.DImg){
+            window.plugins.Base64.encodeFile($scope.card.DImg, function(base64){
+              //console.log('file base64 encoding: ' + base64);
+              $scope.currDImg =  base64;
             });
           }
+          $scope.card.timing = prevTime;
           $rootScope.timeout = $timeout(function(){
             if($scope.counter < DbQuestions.questions.length - 1){
               $scope.next(false);
@@ -474,7 +534,6 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             $scope.card.timing -= 1;
             $scope.$apply();
           }, 1000);
-          $scope.modal.show();
         }
       };
       $scope.end = function(userAns){
@@ -562,7 +621,7 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEdito
       /*if($scope.correct == QaStorage.q.length){
         $scope.levelUp = true;
       }*/
-      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.95){
+      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.7){
         $scope.levelUp = true;
       }
       break;
@@ -583,10 +642,10 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEdito
           }
         }
       }*/
-      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.9){
+      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.6){
         $scope.levelUp = true;
       }
-      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.55){
+      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.20){
         $scope.levelDown = true;
       }
       break;
@@ -607,10 +666,10 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEdito
           }
         }
       }*/
-      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.8){
+      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.5){
         $scope.levelUp = true;
       }
-      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.5){
+      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.15){
         $scope.levelDown = true;
       }
       break;
@@ -631,10 +690,10 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEdito
           }
         }
       }*/
-      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.6){
+      if($scope.correct/parseFloat(QaStorage.q.length) >= 0.4){
         $scope.levelUp = true;
       }
-      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.4){
+      else if($scope.correct/parseFloat(QaStorage.q.length) <= 0.15){
         $scope.levelDown = true;
       }
       break;
@@ -647,7 +706,7 @@ app.controller('QaEndCtrl', function($scope, QaStorage, DbQuestions, PointsEdito
           }
         }
       }*/
-      if($scope.correct/parseFloat(QaStorage.q.length) <= 0.3){
+      if($scope.correct/parseFloat(QaStorage.q.length) <= 0.1){
         $scope.levelDown = true;
       }
       break;
