@@ -29,11 +29,46 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
   var totalCorrect = 0;
   var totalWrong = 0;
   var skip = 0;
+  String.prototype.replaceBetween = function(start, end, what) {
+    return this.substring(0, start) + what + this.substring(end);
+  };
+  var katexConvertor = function(str){
+    var katStr = [];
+    var katCount = 0;
+    var limits = [];
+    for(var l = 0; l < str.length; l++){
+      if(str.charAt(l) == "`"){
+        console.log("` detected`");
+        var lower = l;
+        var toConvert = "";
+        ++l;
+        while(str.charAt(l) != "`"){
+          toConvert += str.charAt(l);
+          l++;
+        }
+        var upper = l;
+        limits.push([lower, upper]);
+        katStr.push(katex.renderToString(toConvert, {displayMode: true}));
+        katCount++;
+        console.log("katCount = " + katCount);
+      }
+    }
+    if(katStr.length){
+      for(l = katStr.length-1; l >= 0; l--){
+        console.log("l= " + l);
+        str = str.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
+      }
+      return str;
+    }
+    else{
+      return str;
+    }
+  };
   var Question = function(q){
     this.currAns = false;
     this.userAns = "skip";
     this.subject = $stateParams.subject;
-    this.question = q.question;
+    this.question = katexConvertor(q.question);
     this.questionImage = q.questionImage;
     this.topic = $stateParams.topic;
     this.open = function(){
@@ -53,10 +88,10 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
           console.log(strBuilder.join(""));
       });
     };
-    this.a = q.A;
-    this.b = q.B;
-    this.c = q.C;
-    this.d = q.D;
+    this.a = katexConvertor(q.A);
+    this.b = katexConvertor(q.B);
+    this.c = katexConvertor(q.C);
+    this.d = katexConvertor(q.D);
     this.AImg = q.AImg;
     this.BImg = q.BImg;
     this.CImg = q.CImg;
@@ -86,7 +121,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
   console.log("subject = " + $stateParams.subject);
   $rootScope.topic = $stateParams.topic;
   DbQuestions.getQuestions($stateParams.subject, $stateParams.topic).then(function(){ //Get questions from db
-    $scope.currLevel = DbQuestions.level+1;
+    $scope.currLevel = DbQuestions.level;
     switch (DbQuestions.level) {
       case 0:
         skip = -1;
@@ -256,7 +291,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         });
       }
       //katex
-      var katStr = [];
+      /*var katStr = [];
       var katCount = 0;
       var limits = [];
       String.prototype.replaceBetween = function(start, end, what) {
@@ -283,8 +318,12 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
           console.log("l= " + l);
           $scope.card.question = $scope.card.question.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
         }
-      }
+      }*/
       document.getElementById("jax").innerHTML = $scope.card.question;
+      document.getElementById("a").innerHTML = $scope.card.a;
+      document.getElementById("b").innerHTML = $scope.card.b;
+      document.getElementById("c").innerHTML = $scope.card.c;
+      document.getElementById("d").innerHTML = $scope.card.d;
       console.log($scope.card.question);
       $rootScope.timeout = $timeout(function(){
         $scope.next(false);
@@ -399,7 +438,7 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
         cards[$scope.counter-1].userAns = userAns;
         console.log(cards[$scope.counter-1].userAns);
         //$scope.userAns = false;
-        var katStr = [];
+        /*var katStr = [];
         var katCount = 0;
         var limits = [];
         String.prototype.replaceBetween = function(start, end, what) {
@@ -426,8 +465,12 @@ app.controller('QaGameCtrl', function($scope, $rootScope, $stateParams, DbQuesti
             console.log("l= " + l);
             $scope.card.question = $scope.card.question.replaceBetween(limits[l][0], limits[l][1]+1, katStr[l]);
           }
-        }
+        }*/
         document.getElementById("jax").innerHTML = $scope.card.question;
+        document.getElementById("a").innerHTML = $scope.card.a;
+        document.getElementById("b").innerHTML = $scope.card.b;
+        document.getElementById("c").innerHTML = $scope.card.c;
+        document.getElementById("d").innerHTML = $scope.card.d;
         $scope.card.timing = prevTime;
         $rootScope.timeout = $timeout(function(){
           if($scope.counter < DbQuestions.questions.length - 1){
